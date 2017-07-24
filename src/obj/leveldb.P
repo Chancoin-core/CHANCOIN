@@ -1,0 +1,26 @@
+obj/leveldb.o: leveldb.cpp leveldb.h serialize.h allocators.h version.h \
+ clientversion.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/db.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/iterator.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/slice.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/status.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/options.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/write_batch.h \
+ util.h uint256.h netbase.h compat.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/env.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/cache.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/filter_policy.h \
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/helpers/memenv/memenv.h
+leveldb.cpp leveldb.h serialize.h allocators.h version.h :
+ clientversion.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/db.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/iterator.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/slice.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/status.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/options.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/write_batch.h :
+ util.h uint256.h netbase.h compat.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/env.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/cache.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/include/leveldb/filter_policy.h :
+ /home/joey/Documents/Altcoins/CHANCOIN/COUP/src/leveldb/helpers/memenv/memenv.h :

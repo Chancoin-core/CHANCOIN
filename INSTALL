@@ -1,0 +1,9 @@
+Building ChanCoin
+
+See doc/readme-qt.rst for instructions on building ChanCoin-Qt,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of ChanCoin.
+
+See doc/build-*.txt for instructions on building chancoind,
+the intended-for-services, no-graphical-interface, reference
+implementation of ChanCoin.
