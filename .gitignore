@@ -2,6 +2,7 @@ src/*.exe
 src/chancoin
 src/chancoind
 src/test_chancoin
+src/chancoin_old
 .*.swp
 *.*~*
 *.bak
