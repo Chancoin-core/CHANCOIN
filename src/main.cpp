@@ -1745,22 +1745,22 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
         const CTransaction &tx = vtx[i];
 
         // Check if the coins have been decided, through 99.9% consensus in the community, to be burned.
-        for (unsigned int i = 0; i < tx.vin.size(); i++)
+        for (unsigned int j = 0; j < tx.vin.size(); j++)
         {
             if ( 
-                    (tx.vin[i].prevout.hash == uint256("46cc2fd0e6ff151f3e79249cc6e7a910c18061565dc75390a0f0cc26bc428443") && tx.vin[i].prevout.n == 1) || // TESTNET: 1m COINS BURN TEST
-                    (tx.vin[i].prevout.hash == uint256("46cc2fd0e6ff151f3e79249cc6e7a910c18061565dc75390a0f0cc26bc428443") && tx.vin[i].prevout.n == 0) || // TESTNET: 8m COINS BURN TEST
-                    (tx.vin[i].prevout.hash == uint256("eeec8305e7b1eef892d8d7c7de9f63a48b0188cba62af228c4e3bf4d49621c9b") && tx.vin[i].prevout.n == 1) || // TESTNET: 33 COINS BURN TEST
-                    (tx.vin[i].prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && tx.vin[i].prevout.n == 0) || // 853737.95200000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && tx.vin[i].prevout.n == 1) || // 223982.00000000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && tx.vin[i].prevout.n == 1) || // 198223.00000000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && tx.vin[i].prevout.n == 1) || // 200000.00000000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && tx.vin[i].prevout.n == 0) || // 100000.00000000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && tx.vin[i].prevout.n == 1) || // 100000.00000000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && tx.vin[i].prevout.n == 0) || // 100000.00000000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && tx.vin[i].prevout.n == 1) || // 278909.00000000 CHAN burned
-                    (tx.vin[i].prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && tx.vin[i].prevout.n == 1)) { // 100000.00000000 CHAN burned
-                printf("ERROR: ConnectBlock() : burnt coins from txid %s cannot be spent\n", tx.vin[i].prevout.ToString().c_str());
+                    (tx.vin[j].prevout.hash == uint256("46cc2fd0e6ff151f3e79249cc6e7a910c18061565dc75390a0f0cc26bc428443") && tx.vin[j].prevout.n == 1) || // TESTNET: 1m COINS BURN TEST
+                    (tx.vin[j].prevout.hash == uint256("46cc2fd0e6ff151f3e79249cc6e7a910c18061565dc75390a0f0cc26bc428443") && tx.vin[j].prevout.n == 0) || // TESTNET: 8m COINS BURN TEST
+                    (tx.vin[j].prevout.hash == uint256("eeec8305e7b1eef892d8d7c7de9f63a48b0188cba62af228c4e3bf4d49621c9b") && tx.vin[j].prevout.n == 1) || // TESTNET: 33 COINS BURN TEST
+                    (tx.vin[j].prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && tx.vin[j].prevout.n == 0) || // 853737.95200000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && tx.vin[j].prevout.n == 1) || // 223982.00000000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && tx.vin[j].prevout.n == 1) || // 198223.00000000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && tx.vin[j].prevout.n == 1) || // 200000.00000000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && tx.vin[j].prevout.n == 0) || // 100000.00000000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && tx.vin[j].prevout.n == 1) || // 100000.00000000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && tx.vin[j].prevout.n == 0) || // 100000.00000000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && tx.vin[j].prevout.n == 1) || // 278909.00000000 CHAN burned
+                    (tx.vin[j].prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && tx.vin[j].prevout.n == 1)) { // 100000.00000000 CHAN burned
+                printf("ERROR: ConnectBlock() : burnt coins from txid %s cannot be spent\n", tx.vin[j].prevout.ToString().c_str());
                 return false;
             }
         }
