@@ -395,16 +395,16 @@ bool CTransaction::IsStandard(string& strReason) const
         
         // Check if the coins have been decided, through 99.9% consensus in the community, to be burned.
         if ( 
-                txin.prevout.hash == 0x07b4fba0d68428a74b5c830eeb42401dad33b7a106ff122c4f8254182ce5c5d0 && txin.prevout.n == 1 || // TESTNET: 49 COINS BURN TEST
-                txin.prevout.hash == 0x39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166 && txin.prevout.n == 0 || // 853737.95200000 CHAN burned
-                txin.prevout.hash == 0x39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166 && txin.prevout.n == 1 || // 223982.00000000 CHAN burned
-                txin.prevout.hash == 0x5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb && txin.prevout.n == 1 || // 198223.00000000 CHAN burned
-                txin.prevout.hash == 0x71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134 && txin.prevout.n == 1 || // 200000.00000000 CHAN burned
-                txin.prevout.hash == 0xec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372 && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
-                txin.prevout.hash == 0xb733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917 && txin.prevout.n == 1 || // 100000.00000000 CHAN burned
-                txin.prevout.hash == 0x46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6 && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
-                txin.prevout.hash == 0xb4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b && txin.prevout.n == 1 || // 278909.00000000 CHAN burned
-                txin.prevout.hash == 0x68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26 && txin.prevout.n == 1) { // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("07b4fba0d68428a74b5c830eeb42401dad33b7a106ff122c4f8254182ce5c5d0") && txin.prevout.n == 1 || // TESTNET: 49 COINS BURN TEST
+                txin.prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 0 || // 853737.95200000 CHAN burned
+                txin.prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 1 || // 223982.00000000 CHAN burned
+                txin.prevout.hash == uint256("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && txin.prevout.n == 1 || // 198223.00000000 CHAN burned
+                txin.prevout.hash == uint256("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && txin.prevout.n == 1 || // 200000.00000000 CHAN burned
+                txin.prevout.hash == uint256("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && txin.prevout.n == 1 || // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && txin.prevout.n == 1 || // 278909.00000000 CHAN burned
+                txin.prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && txin.prevout.n == 1) { // 100000.00000000 CHAN burned
             printf("ERROR: IsStandard: burnt coins cannot be spent\n");
             return false;
         }
@@ -457,16 +457,16 @@ bool CTransaction::AreInputsStandard(CCoinsViewCache& mapInputs) const
     {
         // Check if the coins have been decided, through 99.9% consensus in the community, to be burned.
         if ( 
-                vin[i].prevout.hash == 0x07b4fba0d68428a74b5c830eeb42401dad33b7a106ff122c4f8254182ce5c5d0 && vin[i].prevout.n == 1 || // TESTNET: 49 COINS BURN TEST
-                vin[i].prevout.hash == 0x39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166 && vin[i].prevout.n == 0 || // 853737.95200000 CHAN burned
-                vin[i].prevout.hash == 0x39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166 && vin[i].prevout.n == 1 || // 223982.00000000 CHAN burned
-                vin[i].prevout.hash == 0x5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb && vin[i].prevout.n == 1 || // 198223.00000000 CHAN burned
-                vin[i].prevout.hash == 0x71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134 && vin[i].prevout.n == 1 || // 200000.00000000 CHAN burned
-                vin[i].prevout.hash == 0xec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372 && vin[i].prevout.n == 0 || // 100000.00000000 CHAN burned
-                vin[i].prevout.hash == 0xb733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917 && vin[i].prevout.n == 1 || // 100000.00000000 CHAN burned
-                vin[i].prevout.hash == 0x46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6 && vin[i].prevout.n == 0 || // 100000.00000000 CHAN burned
-                vin[i].prevout.hash == 0xb4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b && vin[i].prevout.n == 1 || // 278909.00000000 CHAN burned
-                vin[i].prevout.hash == 0x68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26 && vin[i].prevout.n == 1) { // 100000.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("07b4fba0d68428a74b5c830eeb42401dad33b7a106ff122c4f8254182ce5c5d0") && vin[i].prevout.n == 1 || // TESTNET: 49 COINS BURN TEST
+                vin[i].prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && vin[i].prevout.n == 0 || // 853737.95200000 CHAN burned
+                vin[i].prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && vin[i].prevout.n == 1 || // 223982.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && vin[i].prevout.n == 1 || // 198223.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && vin[i].prevout.n == 1 || // 200000.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && vin[i].prevout.n == 0 || // 100000.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && vin[i].prevout.n == 1 || // 100000.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && vin[i].prevout.n == 0 || // 100000.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && vin[i].prevout.n == 1 || // 278909.00000000 CHAN burned
+                vin[i].prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && vin[i].prevout.n == 1) { // 100000.00000000 CHAN burned
             printf("ERROR: AreInputsStandard : burnt coins cannot be spent\n");
             return false;
         }
@@ -615,16 +615,16 @@ bool CTransaction::CheckTransaction(CValidationState &state) const
     {
         // Check if the coins have been decided, through 99.9% consensus in the community, to be burned.
         if ( 
-                txin.prevout.hash == 0x07b4fba0d68428a74b5c830eeb42401dad33b7a106ff122c4f8254182ce5c5d0 && txin.prevout.n == 1 || // TESTNET: 49 COINS BURN TEST
-                txin.prevout.hash == 0x39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166 && txin.prevout.n == 0 || // 853737.95200000 CHAN burned
-                txin.prevout.hash == 0x39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166 && txin.prevout.n == 1 || // 223982.00000000 CHAN burned
-                txin.prevout.hash == 0x5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb && txin.prevout.n == 1 || // 198223.00000000 CHAN burned
-                txin.prevout.hash == 0x71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134 && txin.prevout.n == 1 || // 200000.00000000 CHAN burned
-                txin.prevout.hash == 0xec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372 && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
-                txin.prevout.hash == 0xb733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917 && txin.prevout.n == 1 || // 100000.00000000 CHAN burned
-                txin.prevout.hash == 0x46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6 && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
-                txin.prevout.hash == 0xb4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b && txin.prevout.n == 1 || // 278909.00000000 CHAN burned
-                txin.prevout.hash == 0x68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26 && txin.prevout.n == 1) { // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("07b4fba0d68428a74b5c830eeb42401dad33b7a106ff122c4f8254182ce5c5d0") && txin.prevout.n == 1 || // TESTNET: 49 COINS BURN TEST
+                txin.prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 0 || // 853737.95200000 CHAN burned
+                txin.prevout.hash == uint256("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 1 || // 223982.00000000 CHAN burned
+                txin.prevout.hash == uint256("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && txin.prevout.n == 1 || // 198223.00000000 CHAN burned
+                txin.prevout.hash == uint256("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && txin.prevout.n == 1 || // 200000.00000000 CHAN burned
+                txin.prevout.hash == uint256("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && txin.prevout.n == 1 || // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && txin.prevout.n == 0 || // 100000.00000000 CHAN burned
+                txin.prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && txin.prevout.n == 1 || // 278909.00000000 CHAN burned
+                txin.prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && txin.prevout.n == 1) { // 100000.00000000 CHAN burned
             printf("ERROR: CTransaction::CheckTransaction() : burnt coins cannot be spent\n");
             return state.DoS(100, error("CTransaction::CheckTransaction() : burnt coins unspendable"));
         }
