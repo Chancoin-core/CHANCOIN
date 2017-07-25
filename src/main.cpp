@@ -1185,6 +1185,10 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     if (pindexLast == NULL)
         return nProofOfWorkLimit;
 
+    // Testnet: retarget to min-difficulty every block.
+    if (fTestNet)
+        return nProofOfWorkLimit;
+
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
     {
@@ -1193,11 +1197,8 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         {
             // If the new block's timestamp is more than 2* 10 minutes
             // then allow mining of a min-difficulty block.
-            //if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
-
-            //  Just allow mining of a min-difficulty block.
-            return nProofOfWorkLimit;
-            /*
+            if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
+                return nProofOfWorkLimit;
             else
             {
                 // Return the last non-special-min-difficulty-rules-block
@@ -1206,7 +1207,6 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
                     pindex = pindex->pprev;
                 return pindex->nBits;
             }
-            */
         }
 
         return pindexLast->nBits;
