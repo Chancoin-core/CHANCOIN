@@ -405,7 +405,7 @@ bool CTransaction::IsStandard(string& strReason) const
                 (txin.prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && txin.prevout.n == 0) || // 100000.00000000 CHAN burned
                 (txin.prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && txin.prevout.n == 1) || // 278909.00000000 CHAN burned
                 (txin.prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && txin.prevout.n == 1)) { // 100000.00000000 CHAN burned
-            printf("ERROR: IsStandard: burnt coins cannot be spent\n");
+            printf("ERROR: IsStandard: burnt coins from txid %s cannot be spent\n", txin.prevout.ToString().c_str());
             return false;
         }
         // Biggest 'standard' txin is a 3-signature 3-of-3 CHECKMULTISIG
@@ -467,7 +467,7 @@ bool CTransaction::AreInputsStandard(CCoinsViewCache& mapInputs) const
                 (vin[i].prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && vin[i].prevout.n == 0) || // 100000.00000000 CHAN burned
                 (vin[i].prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && vin[i].prevout.n == 1) || // 278909.00000000 CHAN burned
                 (vin[i].prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && vin[i].prevout.n == 1)) { // 100000.00000000 CHAN burned
-            printf("ERROR: AreInputsStandard : burnt coins cannot be spent\n");
+            printf("ERROR: AreInputsStandard : burnt coins from txid %s cannot be spent\n", vin[i].prevout.ToString().c_str());
             return false;
         }
         const CTxOut& prev = GetOutputFor(vin[i], mapInputs);
@@ -625,7 +625,7 @@ bool CTransaction::CheckTransaction(CValidationState &state) const
                 (txin.prevout.hash == uint256("46d6ae832eac7e191464108f86010e5a89dee765caaf8afffe7c145af4e38ca6") && txin.prevout.n == 0) || // 100000.00000000 CHAN burned
                 (txin.prevout.hash == uint256("b4f129056a78566b6b10726eb80177ba8d4c706df6b4269fcee0d0c4f0bce87b") && txin.prevout.n == 1) || // 278909.00000000 CHAN burned
                 (txin.prevout.hash == uint256("68dc873bc3cce5d1054124a94d2af459ddc3a19b1ff0d7f55b27c6843a83cd26") && txin.prevout.n == 1)) { // 100000.00000000 CHAN burned
-            printf("ERROR: CTransaction::CheckTransaction() : burnt coins cannot be spent\n");
+            printf("ERROR: CTransaction::CheckTransaction() : burnt coins from txid %s cannot be spent\n", txin.prevout.ToString().c_str());
             return state.DoS(100, error("CTransaction::CheckTransaction() : burnt coins unspendable"));
         }
         if (vInOutPoints.count(txin.prevout))
@@ -1178,6 +1178,7 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
 
 unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
+
     unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
 
     // Genesis block
@@ -1192,8 +1193,11 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         {
             // If the new block's timestamp is more than 2* 10 minutes
             // then allow mining of a min-difficulty block.
-            if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
-                return nProofOfWorkLimit;
+            //if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
+
+            //  Just allow mining of a min-difficulty block.
+            return nProofOfWorkLimit;
+            /*
             else
             {
                 // Return the last non-special-min-difficulty-rules-block
@@ -1202,6 +1206,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
                     pindex = pindex->pprev;
                 return pindex->nBits;
             }
+            */
         }
 
         return pindexLast->nBits;
