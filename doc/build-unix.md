@@ -28,7 +28,7 @@ Dependencies
 
 [miniupnpc](http://miniupnp.free.fr/) may be used for UPnP port mapping.  It can be downloaded from [here](
 http://miniupnp.tuxfamily.org/files/).  UPnP support is compiled in and
-turned off by default.  Set USE_UPNP to a different value to control this:
+turned off by default.  Set USE\_UPNP to a different value to control this:
 
 	USE_UPNP=     No UPnP support miniupnp not required
 	USE_UPNP=0    (the default) UPnP support turned off by default at runtime
@@ -62,7 +62,14 @@ for Ubuntu 12.04:
 
 	sudo apt-get install libboost-all-dev
 
- db4.8 packages are available [here](https://launchpad.net/~bitcoin/+archive/bitcoin).
+db4.8 packages are available [here](https://launchpad.net/~bitcoin/+archive/bitcoin).
+
+Install them with add-apt-repository:
+
+    sudo apt-get install software-properties-common
+    sudo add-apt-repository ppa:bitcoin/bitcoin
+    sudo apt-get update
+    sudo apt-get install libdb4.8-dev libdb4.8++-dev
 
  Ubuntu precise has packages for libdb5.1-dev and libdb5.1++-dev,
  but using these will break binary wallet compatibility, and is not recommended.
