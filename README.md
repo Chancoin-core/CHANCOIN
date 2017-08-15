@@ -1,4 +1,4 @@
-Download Windows binaries [here] (https://github.com/Chancoin-core/CHANCOIN/releases/latest)
+Download Windows binaries [here](https://github.com/chancoin-project/chancoin/tags) 
 ===
 
 ChanCoin integration/staging tree
