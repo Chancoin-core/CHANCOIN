@@ -26,6 +26,32 @@ The rest is the same as Bitcoin.
 For more information, as well as an immediately useable, binary version of
 the ChanCoin client sofware, see http://www.chancoin.org.
 
+Installation
+------------
+
+If you're on Windows, the installation is simple -- just download the binaries from https://github.com/Chancoin-core/CHANCOIN/releases/latest. 
+
+If you're on unix, since at the moment we don't have Linux/OSX binaries, you'll have to
+compile yourself. It is a relatively easy process, however, and is explained in greater detail [here](https://github.com/Chancoin-core/CHANCOIN/blob/master/doc/readme-qt.rst). If you just want a quick tutorial, it is quite simple:
+
+First, install the build dependencies:
+```
+sudo apt-get install qt4-qmake libqt4-dev build-essential libboost-dev libboost-system-dev \
+    libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev \
+    libssl-dev libdb++-dev libminiupnpc-dev
+```
+
+Then, the qmake dependencies:
+
+`sudo apt-get install qt5-qmake libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev-tools`
+
+
+Now clone the repository:
+
+`git clone https://github.com/Chancoin-core/CHANCOIN chancoin`
+
+Then `cd` into chancoin and run `qmake` and `make`. 
+
 License
 -------
 
@@ -68,7 +94,7 @@ submit new unit tests for old code.
 
 Unit tests for the core code are in `src/test/`. To compile and run them:
 
-    cd src; make -f makefile.unix test
+	cd src; make -f makefile.unix test
 
 Unit tests for the GUI code are in `src/qt/test/`. To compile and run them:
 
