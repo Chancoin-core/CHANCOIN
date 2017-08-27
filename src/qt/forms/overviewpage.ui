@@ -208,6 +208,40 @@
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="QLabel" name="labelLogo">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>64</width>
+           <height>64</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>512</width>
+           <height>512</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="../bitcoin.qrc">:/icons/bitcoin</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -281,37 +315,6 @@
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelLogo">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>64</width>
-           <height>64</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>512</width>
-           <height>512</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="../bitcoin.qrc">:/icons/bitcoin</pixmap>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
       </layout>
