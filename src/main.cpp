@@ -11,6 +11,7 @@
 #include "init.h"
 #include "ui_interface.h"
 #include "checkqueue.h"
+#include "dag.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -33,7 +34,7 @@ CCriticalSection cs_main;
 
 CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
-
+DAGSystem dag;
 map<uint256, CBlockIndex*> mapBlockIndex;
 uint256 hashGenesisBlock("0x72c18e80787d961e92bc4bd508dbe7d7c5189794d449a6a58853f4e032b4831c");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // ChanCoin: starting difficulty is 1 / 2^12
