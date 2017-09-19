@@ -10,6 +10,7 @@
 #include "net.h"
 #include "script.h"
 #include "scrypt.h"
+#include "dag.h"
 
 #include <list>
 
@@ -75,6 +76,7 @@ extern CScript COINBASE_FLAGS;
 
 
 extern CCriticalSection cs_main;
+extern CDAGSystem dag;
 extern std::map<uint256, CBlockIndex*> mapBlockIndex;
 extern std::set<CBlockIndex*, CBlockIndexWorkComparator> setBlockIndexValid;
 extern uint256 hashGenesisBlock;
@@ -119,6 +121,7 @@ class CCoinsView;
 class CCoinsViewCache;
 class CScriptCheck;
 class CValidationState;
+class CBlockHeader;
 
 struct CBlockTemplate;
 
@@ -168,7 +171,7 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
 /** Check mined block */
 bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey);
 /** Check whether a block hash satisfies the proof-of-work requirement specified by nBits */
-bool CheckProofOfWork(uint256 hash, unsigned int nBits);
+bool CheckProofOfWork(CBlock header);
 /** Calculate the minimum amount of work a received block needs, without knowing its direct parent */
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime);
 /** Get the number of active peers */
@@ -1286,13 +1289,14 @@ class CBlockHeader
 {
 public:
     // header
-    static const int CURRENT_VERSION=2;
+    static const int CURRENT_VERSION=3;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
+    uint256 hashMix;
 
     CBlockHeader()
     {
@@ -1308,6 +1312,9 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        if(this->nVersion == 3) {
+            READWRITE(hashMix);
+        }
     )
 
     void SetNull()
@@ -1318,6 +1325,7 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        hashMix = 0;
     }
 
     bool IsNull() const
@@ -1327,6 +1335,9 @@ public:
 
     uint256 GetHash() const
     {
+        if(nVersion == 3) {
+            return Hash(BEGIN(nVersion), END(hashMix));
+        }
         return Hash(BEGIN(nVersion), END(nNonce));
     }
 
@@ -1337,6 +1348,8 @@ public:
 
     void UpdateTime(const CBlockIndex* pindexPrev);
 };
+
+#include "hashimoto.h"
 
 class CBlock : public CBlockHeader
 {
@@ -1387,6 +1400,7 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.hashMix        = hashMix;
         return block;
     }
 
@@ -1490,7 +1504,7 @@ public:
         }
 
         // Check the header
-        if (!CheckProofOfWork(GetPoWHash(), nBits))
+        if (!CheckProofOfWork(*this))
             return error("CBlock::ReadFromDisk() : errors in block header");
 
         return true;
@@ -1500,14 +1514,14 @@ public:
 
     void print() const
     {
-        printf("CBlock(hash=%s, input=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%"PRIszu")\n",
+        printf("CBlock(hash=%s, input=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, hashMix=%s, vtx=%"PRIszu")\n",
             GetHash().ToString().c_str(),
             HexStr(BEGIN(nVersion),BEGIN(nVersion)+80,false).c_str(),
             GetPoWHash().ToString().c_str(),
             nVersion,
             hashPrevBlock.ToString().c_str(),
             hashMerkleRoot.ToString().c_str(),
-            nTime, nBits, nNonce,
+            nTime, nBits, nNonce, hashMix.ToString().c_str(),
             vtx.size());
         for (unsigned int i = 0; i < vtx.size(); i++)
         {

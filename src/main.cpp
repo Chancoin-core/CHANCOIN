@@ -11,7 +11,6 @@
 #include "init.h"
 #include "ui_interface.h"
 #include "checkqueue.h"
-#include "dag.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -34,7 +33,7 @@ CCriticalSection cs_main;
 
 CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
-DAGSystem dag;
+CDAGSystem dag;
 map<uint256, CBlockIndex*> mapBlockIndex;
 uint256 hashGenesisBlock("0x72c18e80787d961e92bc4bd508dbe7d7c5189794d449a6a58853f4e032b4831c");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // ChanCoin: starting difficulty is 1 / 2^12
@@ -1318,18 +1317,26 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     return bnNew.GetCompact();
 }
 
-bool CheckProofOfWork(uint256 hash, unsigned int nBits)
+bool CheckProofOfWork(CBlock block)
 {
     CBigNum bnTarget;
-    bnTarget.SetCompact(nBits);
+    bnTarget.SetCompact(block.GetBlockHeader().nBits);
 
     // Check range
     if (bnTarget <= 0 || bnTarget > bnProofOfWorkLimit)
         return error("CheckProofOfWork() : nBits below minimum work");
 
     // Check proof of work matches claimed amount
-    if (hash > bnTarget.getuint256())
+    if (block.GetPoWHash() > bnTarget.getuint256())
         return error("CheckProofOfWork() : hash doesn't match nBits");
+
+    if(block.GetBlockHeader().nVersion > 2) {
+        uint256 mixHash = block.GetBlockHeader().hashMix;
+        CHashimotoResult hash = hashimoto(block.GetBlockHeader());
+        if(mixHash != hash.cmix) {
+            return error("CheckProofOfWork() : header does not match mixHash");
+        }
+    }
 
     return true;
 }
@@ -2265,7 +2272,7 @@ bool CBlock::CheckBlock(CValidationState &state, bool fCheckPOW, bool fCheckMerk
     }
 
     // Check proof of work matches claimed amount
-    if (fCheckPOW && !CheckProofOfWork(GetPoWHash(), nBits))
+    if (fCheckPOW && !CheckProofOfWork(this->GetBlockHeader()))
         return state.DoS(50, error("CheckBlock() : proof of work failed"));
 
     // Check timestamp

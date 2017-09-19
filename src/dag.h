@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string.h>
 #include "Lyra2RE/Lyra2RE.h"
+#include "Lyra2RE/sph_keccak.h"
 #define WORD_BYTES 4
 #define DATASET_BYTES_INIT 536870912
 #define DATASET_BYTES_GROWTH 4194304
@@ -53,30 +54,30 @@ inline unsigned long get_full_size(unsigned long block_number) {
 extern char *calc_dataset_item(char *cache, unsigned long i);
 
 extern char* mkcache(unsigned long size, char* seed);
-class DAGItem {
+class CDAGItem {
 public:
     char *node;
-    DAGItem (unsigned long i,char *cache) {
+    CDAGItem (unsigned long i,char *cache) {
         node = calc_dataset_item(cache, i);
     }
 
-    ~DAGItem() {
+    ~CDAGItem() {
         free(node);
     }
 };
 
-class DAGSystem {
+class CDAGSystem {
 private:
     char seed[32];
     char *cache;
 public:
-    DAGSystem() {
+    CDAGSystem() {
         memset(seed, 0, 32);
         cache = mkcache(get_cache_size(0), seed);
     }
 
-    DAGItem GetNode(unsigned long i) {
-        return DAGItem(i, cache);
+    CDAGItem GetNode(unsigned long i) {
+        return CDAGItem(i, cache);
     }
 };
 

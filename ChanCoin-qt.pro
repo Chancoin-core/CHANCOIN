@@ -230,7 +230,8 @@ HEADERS += src/qt/bitcoingui.h \
     src/Lyra2RE/Sponge.h \
     src/Lyra2RE/Lyra2RE.h \
     src/Lyra2RE/Lyra2.h \
-    src/dag.h
+    src/dag.h \
+    src/hashimoto.h
 
 SOURCES += src/qt/bitcoin.cpp \
     src/qt/bitcoingui.cpp \
@@ -311,7 +312,8 @@ SOURCES += src/qt/bitcoin.cpp \
     src/Lyra2RE/Sponge.c \
     src/Lyra2RE/Lyra2RE.c \
     src/Lyra2RE/Lyra2.c \
-    src/dag.cpp
+    src/dag.cpp \
+    src/hashimoto.cpp
 
 RESOURCES += src/qt/bitcoin.qrc
 
