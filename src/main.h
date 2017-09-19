@@ -1388,6 +1388,10 @@ public:
     {
         uint256 thash;
         scrypt_1024_1_1_256(BEGIN(nVersion), BEGIN(thash));
+        if(nVersion > 2){
+            CHashimotoResult r = hashimoto((*this).GetBlockHeader());
+            return r.result;
+        }
         return thash;
     }
 

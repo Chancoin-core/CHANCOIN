@@ -4803,15 +4803,17 @@ void static ChanCoinMiner(CWallet *pwallet)
         {
             unsigned int nHashesDone = 0;
 
-            uint256 thash;
-            char scratchpad[SCRYPT_SCRATCHPAD_SIZE];
+            //uint256 thash;
+            //char scratchpad[SCRYPT_SCRATCHPAD_SIZE];
             loop
             {
-                scrypt_1024_1_1_256_sp(BEGIN(pblock->nVersion), BEGIN(thash), scratchpad);
+                CHashimotoResult res = hashimoto(pblock->GetBlockHeader());
+                //scrypt_1024_1_1_256_sp(BEGIN(pblock->nVersion), BEGIN(thash), scratchpad);
 
-                if (thash <= hashTarget)
+                if (res.result <= hashTarget)
                 {
                     // Found a solution
+                    pblock->hashMix = res.cmix;
                     SetThreadPriority(THREAD_PRIORITY_NORMAL);
                     CheckWork(pblock, *pwallet, reservekey);
                     SetThreadPriority(THREAD_PRIORITY_LOWEST);

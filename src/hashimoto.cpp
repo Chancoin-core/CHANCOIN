@@ -1,4 +1,5 @@
 #include "hashimoto.h"
+#include "main.h"
 
 CHashimotoResult hashimoto(CBlockHeader blockToHash) {
     uint64_t n = floor(get_full_size(0) / HASH_BYTES);
