@@ -5,6 +5,7 @@
 #include <string.h>
 #include "Lyra2RE/Lyra2RE.h"
 #include "Lyra2RE/sph_keccak.h"
+#include "Lyra2RE/sph_blake.h"
 #define WORD_BYTES 4
 #define DATASET_BYTES_INIT 536870912
 #define DATASET_BYTES_GROWTH 4194304
@@ -53,6 +54,8 @@ inline unsigned long get_full_size(unsigned long block_number) {
 
 extern char *calc_dataset_item(char *cache, unsigned long i);
 
+extern char* calc_full_dataset(char *cache);
+
 extern char* mkcache(unsigned long size, char* seed);
 class CDAGItem {
 public:
@@ -66,18 +69,40 @@ public:
     }
 };
 
+class CDAGFullDerivItem {
+public:
+    char *node;
+    CDAGFullDerivItem (unsigned long i, char *fdag) {
+        node = fdag + (i*32);
+    }
+
+    ~CDAGFullDerivItem() {
+
+    }
+};
+
+
 class CDAGSystem {
 private:
     char seed[32];
     char *cache;
+    char *fdag = NULL;
 public:
     CDAGSystem() {
         memset(seed, 0, 32);
         cache = mkcache(get_cache_size(0), seed);
+        fdag = calc_full_dataset(cache);
     }
 
     CDAGItem GetNode(unsigned long i) {
         return CDAGItem(i, cache);
+    }
+
+    CDAGFullDerivItem GetFullNodeDerv(unsigned long i) {
+        if(!fdag) {
+            //fdag = calc_full_dataset(cache);
+        }
+        return CDAGFullDerivItem(i, fdag);
     }
 };
 

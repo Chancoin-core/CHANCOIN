@@ -6,6 +6,7 @@ CHashimotoResult hashimoto(CBlockHeader blockToHash) {
     uint64_t w = floor(MIX_BYTES / WORD_BYTES);
     uint64_t mixhashes = MIX_BYTES / WORD_BYTES;
     std::vector<uint8_t> header;
+    header.resize(80);
     uint256 hashedHeader;
     std::copy((uint8_t*)&blockToHash,(uint8_t*)&blockToHash + 80, header.begin());
     lyra2re2_hash((char *)header.data(),(char*)&hashedHeader);
@@ -17,7 +18,7 @@ CHashimotoResult hashimoto(CBlockHeader blockToHash) {
         uint64_t p = fnv(i ^ header[0], mix[i % w]) % ((uint64_t)floor(n / mixhashes) * mixhashes);
         uint8_t newdata[MIX_BYTES];
         for(int j = 0; j < MIX_BYTES / HASH_BYTES; j++) {
-            CDAGItem item = dag.GetNode(p+j);
+            CDAGFullDerivItem item = dag.GetFullNodeDerv(p+j);
             memcpy(newdata + (j * HASH_BYTES), item.node, HASH_BYTES);
         }
         for(int i = 0; i < MIX_BYTES; i++) {
@@ -31,8 +32,9 @@ CHashimotoResult hashimoto(CBlockHeader blockToHash) {
     CHashimotoResult result;
     memcpy(&result.cmix, cmix, MIX_BYTES/4);
     std::vector<uint8_t> hash;
+    hash.resize(96);
     std::copy((uint8_t*)&blockToHash,(uint8_t*)&blockToHash + 80, hash.begin());
-    std::copy(cmix, cmix + 80, hash.end());
+    std::copy(cmix, cmix + 16, hash.begin() + 80);
     lyra2re2_hash96((char *)hash.data(), (char *)&result.result);
     return result;
 

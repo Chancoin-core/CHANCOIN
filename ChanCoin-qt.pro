@@ -22,6 +22,7 @@ CONFIG += thread
 OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build
+QMAKE_CXXFLAGS += -std=c++11
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
