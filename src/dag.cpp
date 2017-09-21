@@ -2,9 +2,11 @@
 
 char* mkcache(unsigned long size, char *seed){
     unsigned long n = floor(size / HASH_BYTES);
-    char *cache = (char*)malloc(size);
-    lyra2re2_hash(cache, seed);
     sph_blake256_context ctx_keccak;
+    char *cache = (char*)malloc(size);
+    sph_blake256_init(&ctx_keccak);
+    sph_blake256 (&ctx_keccak,seed, 32);
+    sph_blake256_close(&ctx_keccak, cache);
     for(int i = 0; i < (n - 1); i++) {
         sph_blake256_init(&ctx_keccak);
         sph_blake256 (&ctx_keccak,cache + ((i)*32), 32);
@@ -17,7 +19,9 @@ char* mkcache(unsigned long size, char *seed){
             for(int k = 0; k < 32; k++) {
                 mapped[k] = cache[(((i-1+n) % n)*32)+k] ^ cache[(v*32)+k];
             }
-            lyra2re2_hash((char*)mapped, (char*)mapped);
+            sph_blake256_init(&ctx_keccak);
+            sph_blake256 (&ctx_keccak,mapped, 32);
+            sph_blake256_close(&ctx_keccak, mapped);
             memcpy(cache + (i*32), mapped, 32);
         }
     }
