@@ -1314,7 +1314,6 @@ public:
         READWRITE(nNonce);
         if(this->nVersion == 3) {
             READWRITE(hashMix);
-            printf("LOAD\n");
         }
     )
 

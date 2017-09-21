@@ -1319,6 +1319,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
 
 bool CheckProofOfWork(CBlock block)
 {
+    block.print();
     CBigNum bnTarget;
     bnTarget.SetCompact(block.GetBlockHeader().nBits);
 
