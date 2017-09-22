@@ -91,7 +91,7 @@ public:
     CDAGSystem() {
         memset(seed, 0, 32);
         cache = mkcache(get_cache_size(0), seed);
-        fdag = calc_full_dataset(cache);
+        //fdag = calc_full_dataset(cache);
     }
 
     CDAGItem GetNode(unsigned long i) {
@@ -100,7 +100,7 @@ public:
 
     CDAGFullDerivItem GetFullNodeDerv(unsigned long i) {
         if(!fdag) {
-            //fdag = calc_full_dataset(cache);
+            fdag = calc_full_dataset(cache);
         }
         return CDAGFullDerivItem(i, fdag);
     }

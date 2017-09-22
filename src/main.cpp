@@ -1396,13 +1396,13 @@ void static InvalidBlockFound(CBlockIndex *pindex) {
 bool ConnectBestBlock(CValidationState &state) {
     do {
         CBlockIndex *pindexNewBest;
-
         {
             std::set<CBlockIndex*,CBlockIndexWorkComparator>::reverse_iterator it = setBlockIndexValid.rbegin();
             if (it == setBlockIndexValid.rend())
                 return true;
             pindexNewBest = *it;
         }
+        pindexNewBest->print();
 
         if (pindexNewBest == pindexBest || (pindexBest && pindexNewBest->nChainWork == pindexBest->nChainWork))
             return true; // nothing to do
