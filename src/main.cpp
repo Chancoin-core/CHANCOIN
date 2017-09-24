@@ -1319,7 +1319,6 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
 
 bool CheckProofOfWork(CBlock block)
 {
-    block.print();
     CBigNum bnTarget;
     bnTarget.SetCompact(block.GetBlockHeader().nBits);
 
@@ -1333,7 +1332,7 @@ bool CheckProofOfWork(CBlock block)
 
     if(block.GetBlockHeader().nVersion > 2) {
         uint256 mixHash = block.GetBlockHeader().hashMix;
-        CHashimotoResult hash = hashimoto(block.GetBlockHeader());
+        CHashimotoResult hash = hashimoto(block.GetBlockHeader(), block.hashHeight);
         if(mixHash != hash.cmix) {
             return error("CheckProofOfWork() : header does not match mixHash");
         }
@@ -2271,7 +2270,6 @@ bool CBlock::CheckBlock(CValidationState &state, bool fCheckPOW, bool fCheckMerk
         if (nTxids > 4500)
             return error("CheckBlock() : 15 August maxlocks violation");
     }
-
     // Check proof of work matches claimed amount
     if (fCheckPOW && !CheckProofOfWork(this->GetBlockHeader()))
         return state.DoS(50, error("CheckBlock() : proof of work failed"));
@@ -2337,7 +2335,9 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
             return state.DoS(10, error("AcceptBlock() : prev block not found"));
         pindexPrev = (*mi).second;
         nHeight = pindexPrev->nHeight+1;
-
+        if(hashHeight != nHeight) {
+            return state.DoS(100, error("AcceptBlock() : bad hashHeight"));
+        }
         // Check proof of work
         if (nBits != GetNextWorkRequired(pindexPrev, this))
             return state.DoS(100, error("AcceptBlock() : incorrect proof of work"));
@@ -4776,8 +4776,8 @@ void static ChanCoinMiner(CWallet *pwallet)
         if (!pblocktemplate.get())
             return;
         CBlock *pblock = &pblocktemplate->block;
+        pblock->hashHeight = pindexPrev->nHeight + 1;
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
-
         printf("Running ChanCoinMiner with %" PRIszu " transactions in block (%u bytes)\n", pblock->vtx.size(),
                ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
@@ -4808,7 +4808,7 @@ void static ChanCoinMiner(CWallet *pwallet)
             //char scratchpad[SCRYPT_SCRATCHPAD_SIZE];
             loop
             {
-                CHashimotoResult res = hashimoto(pblock->GetBlockHeader());
+                CHashimotoResult res = hashimoto(pblock->GetBlockHeader(), pblock->hashHeight);
                 //scrypt_1024_1_1_256_sp(BEGIN(pblock->nVersion), BEGIN(thash), scratchpad);
 
                 if (res.result <= hashTarget)
@@ -4901,7 +4901,7 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet)
 
     if (nThreads == 0 || !fGenerate)
         return;
-    dag.GetFullNodeDerv(0);
+    //dag.GetFullNodeDerv(0);
     minerThreads = new boost::thread_group();
     for (int i = 0; i < nThreads; i++)
         minerThreads->create_thread(boost::bind(&ChanCoinMiner, pwallet));

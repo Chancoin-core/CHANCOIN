@@ -1360,6 +1360,8 @@ public:
     // memory only
     mutable std::vector<uint256> vMerkleTree;
 
+    unsigned int hashHeight = 0;
+
     CBlock()
     {
         SetNull();
@@ -1375,6 +1377,9 @@ public:
     (
         READWRITE(*(CBlockHeader*)this);
         READWRITE(vtx);
+        if(nVersion > 2) {
+            READWRITE(hashHeight);
+        }
     )
 
     void SetNull()
@@ -1389,7 +1394,7 @@ public:
         uint256 thash;
         scrypt_1024_1_1_256(BEGIN(nVersion), BEGIN(thash));
         if(nVersion > 2){
-            CHashimotoResult r = hashimoto((*this).GetBlockHeader());
+            CHashimotoResult r = hashimoto((*this).GetBlockHeader(), hashHeight);
             return r.result;
         }
         return thash;
@@ -1520,7 +1525,7 @@ public:
     {
         printf("CBlock(hash=%s, input=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, hashMix=%s, vtx=%" PRIszu ")\n",
             GetHash().ToString().c_str(),
-            HexStr(BEGIN(nVersion),BEGIN(nVersion)+80,false).c_str(),
+            HexStr(BEGIN(nVersion),BEGIN(nVersion)+96,false).c_str(),
             GetPoWHash().ToString().c_str(),
             nVersion,
             hashPrevBlock.ToString().c_str(),
@@ -1688,6 +1693,7 @@ public:
     // block header
     int nVersion;
     uint256 hashMerkleRoot;
+    uint256 hashMix;
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
@@ -1709,6 +1715,7 @@ public:
 
         nVersion       = 0;
         hashMerkleRoot = 0;
+        hashMix        = 0;
         nTime          = 0;
         nBits          = 0;
         nNonce         = 0;
@@ -1730,6 +1737,7 @@ public:
 
         nVersion       = block.nVersion;
         hashMerkleRoot = block.hashMerkleRoot;
+        hashMix        = block.hashMix;
         nTime          = block.nTime;
         nBits          = block.nBits;
         nNonce         = block.nNonce;
@@ -1763,6 +1771,7 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.hashMix        = hashMix;
         return block;
     }
 
@@ -1834,10 +1843,10 @@ public:
 
     std::string ToString() const
     {
-        return strprintf("CBlockIndex(pprev=%p, pnext=%p, nHeight=%d, merkle=%s, hashBlock=%s)",
+        return strprintf("CBlockIndex(pprev=%p, pnext=%p, nHeight=%d, merkle=%s, hashBlock=%s, hashMix=%s)",
             pprev, pnext, nHeight,
             hashMerkleRoot.ToString().c_str(),
-            GetBlockHash().ToString().c_str());
+            GetBlockHash().ToString().c_str(), hashMix.ToString().c_str());
     }
 
     void print() const
@@ -1897,6 +1906,9 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        if(this->nVersion > 2) {
+            READWRITE(hashMix);
+        }
     )
 
     uint256 GetBlockHash() const
@@ -1908,6 +1920,7 @@ public:
         block.nTime           = nTime;
         block.nBits           = nBits;
         block.nNonce          = nNonce;
+        block.hashMix         = hashMix;
         return block.GetHash();
     }
 

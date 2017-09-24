@@ -9,6 +9,6 @@ struct CHashimotoResult {
     uint256 result;
 };
 
-CHashimotoResult hashimoto(CBlockHeader blockToHash);
+CHashimotoResult hashimoto(CBlockHeader blockToHash, unsigned long height);
 
 #endif // HASHIMOTO_H
