@@ -1297,6 +1297,7 @@ public:
     unsigned int nBits;
     unsigned int nNonce;
     uint256 hashMix;
+    unsigned long nHeight;
 
     CBlockHeader()
     {
@@ -1314,6 +1315,7 @@ public:
         READWRITE(nNonce);
         if(this->nVersion == 3) {
             READWRITE(hashMix);
+            READWRITE(nHeight);
         }
     )
 
@@ -1326,6 +1328,7 @@ public:
         nBits = 0;
         nNonce = 0;
         hashMix = 0;
+        nHeight = 0;
     }
 
     bool IsNull() const
@@ -1336,7 +1339,7 @@ public:
     uint256 GetHash() const
     {
         if(nVersion == 3) {
-            return Hash(BEGIN(nVersion), END(hashMix));
+            return Hash(BEGIN(nVersion), END(nHeight));
         }
         return Hash(BEGIN(nVersion), END(nNonce));
     }
@@ -1360,8 +1363,6 @@ public:
     // memory only
     mutable std::vector<uint256> vMerkleTree;
 
-    unsigned int hashHeight = 0;
-
     CBlock()
     {
         SetNull();
@@ -1377,9 +1378,6 @@ public:
     (
         READWRITE(*(CBlockHeader*)this);
         READWRITE(vtx);
-        if(nVersion > 2) {
-            READWRITE(hashHeight);
-        }
     )
 
     void SetNull()
@@ -1394,7 +1392,7 @@ public:
         uint256 thash;
         scrypt_1024_1_1_256(BEGIN(nVersion), BEGIN(thash));
         if(nVersion > 2){
-            CHashimotoResult r = hashimoto((*this).GetBlockHeader(), hashHeight);
+            CHashimotoResult r = hashimoto((*this).GetBlockHeader());
             return r.result;
         }
         return thash;
@@ -1410,6 +1408,7 @@ public:
         block.nBits          = nBits;
         block.nNonce         = nNonce;
         block.hashMix        = hashMix;
+        block.nHeight        = nHeight;
         return block;
     }
 
@@ -1741,6 +1740,7 @@ public:
         nTime          = block.nTime;
         nBits          = block.nBits;
         nNonce         = block.nNonce;
+        nHeight        = block.nHeight;
     }
 
     CDiskBlockPos GetBlockPos() const {
@@ -1772,6 +1772,7 @@ public:
         block.nBits          = nBits;
         block.nNonce         = nNonce;
         block.hashMix        = hashMix;
+        block.nHeight        = nHeight;
         return block;
     }
 
@@ -1921,6 +1922,7 @@ public:
         block.nBits           = nBits;
         block.nNonce          = nNonce;
         block.hashMix         = hashMix;
+        block.nHeight         = nHeight;
         return block.GetHash();
     }
 
