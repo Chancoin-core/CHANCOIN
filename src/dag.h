@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string.h>
 #include <map>
+#include "sync.h"
 #include "Lyra2RE/Lyra2RE.h"
 #include "Lyra2RE/sph_keccak.h"
 #include "Lyra2RE/sph_blake.h"
@@ -95,35 +96,43 @@ public:
 
     CDAGItem GetNode(unsigned long i, unsigned long height) {
         sph_blake256_context ctx_blake;
-        if(cache[(unsigned long)floor(height/200.0)] == nullptr) {
-            if (seed.find((unsigned long)floor(height/200.0)) == seed.end()) {
-                memset(seed[(unsigned long)floor(height/200.0)], 0, 32);
-                for(unsigned long iters = 0; iters < (unsigned long)floor(height/200.0); iters++) {
-                    sph_blake256_init(&ctx_blake);
-                    sph_blake256 (&ctx_blake,seed[(unsigned long)floor(height/200.0)], 32);
-                    sph_blake256_close(&ctx_blake, seed[(unsigned long)floor(height/200.0)]);
+        static CCriticalSection cs;
+        {
+            LOCK(cs);
+            if(cache[(unsigned long)floor(height/200.0)] == nullptr) {
+                if (seed.find((unsigned long)floor(height/200.0)) == seed.end()) {
+                    memset(seed[(unsigned long)floor(height/200.0)], 0, 32);
+                    for(unsigned long iters = 0; iters < (unsigned long)floor(height/200.0); iters++) {
+                        sph_blake256_init(&ctx_blake);
+                        sph_blake256 (&ctx_blake,seed[(unsigned long)floor(height/200.0)], 32);
+                        sph_blake256_close(&ctx_blake, seed[(unsigned long)floor(height/200.0)]);
+                    }
                 }
+                cache[(unsigned long)floor(height/200.0)] = mkcache(get_cache_size(height), seed[(unsigned long)floor(height/200.0)]);
             }
-            cache[(unsigned long)floor(height/200.0)] = mkcache(get_cache_size(height), seed[(unsigned long)floor(height/200.0)]);
         }
         return CDAGItem(i, cache[(unsigned long)floor(height/200.0)], get_cache_size(height));
     }
 
     CDAGFullDerivItem GetFullNodeDerv(unsigned long i, unsigned long height) {
         sph_blake256_context ctx_blake;
-        if(cache[(unsigned long)floor(height/200.0)] == nullptr) {
-            if (seed.find((unsigned long)floor(height/200.0)) == seed.end()) {
-                memset(seed[(unsigned long)floor(height/200.0)], 0, 32);
-                for(unsigned long iters = 0; iters < (unsigned long)floor(height/200.0); iters++) {
-                    sph_blake256_init(&ctx_blake);
-                    sph_blake256 (&ctx_blake,seed[(unsigned long)floor(height/200.0)], 32);
-                    sph_blake256_close(&ctx_blake, seed[(unsigned long)floor(height/200.0)]);
+        static CCriticalSection cs;
+        {
+            LOCK(cs);
+            if(cache[(unsigned long)floor(height/200.0)] == nullptr) {
+                if (seed.find((unsigned long)floor(height/200.0)) == seed.end()) {
+                    memset(seed[(unsigned long)floor(height/200.0)], 0, 32);
+                    for(unsigned long iters = 0; iters < (unsigned long)floor(height/200.0); iters++) {
+                        sph_blake256_init(&ctx_blake);
+                        sph_blake256 (&ctx_blake,seed[(unsigned long)floor(height/200.0)], 32);
+                        sph_blake256_close(&ctx_blake, seed[(unsigned long)floor(height/200.0)]);
+                    }
                 }
+                cache[(unsigned long)floor(height/200.0)] = mkcache(get_cache_size(height), seed[(unsigned long)floor(height/200.0)]);
             }
-            cache[(unsigned long)floor(height/200.0)] = mkcache(get_cache_size(height), seed[(unsigned long)floor(height/200.0)]);
-        }
-        if (fdag.find((unsigned long)floor(height/200.0)) == fdag.end()) {
-            fdag[(unsigned long)floor(height/200.0)] = calc_full_dataset(cache[(unsigned long)floor(height/200.0)], get_full_size(height));
+            if (fdag.find((unsigned long)floor(height/200.0)) == fdag.end()) {
+                fdag[(unsigned long)floor(height/200.0)] = calc_full_dataset(cache[(unsigned long)floor(height/200.0)], get_full_size(height));
+            }
         }
         return CDAGFullDerivItem(i, fdag[(unsigned long)floor(height/200.0)]);
     }
