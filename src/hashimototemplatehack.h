@@ -1,6 +1,9 @@
+#ifndef HASHIMOTOTEMPLATEHACK_H
+#define HASHIMOTOTEMPLATEHACK_H
+//Fuck C++ sometimes.
 #include "hashimoto.h"
 #include "main.h"
-
+template <class CDAGItemType>
 CHashimotoResult hashimoto(CBlockHeader blockToHash) {
     uint64_t n = floor(get_full_size(0) / HASH_BYTES);
     uint64_t w = floor(MIX_BYTES / WORD_BYTES);
@@ -18,8 +21,13 @@ CHashimotoResult hashimoto(CBlockHeader blockToHash) {
         uint64_t p = fnv(i ^ header[0], mix[i % w]) % ((uint64_t)floor(n / mixhashes) * mixhashes);
         uint8_t newdata[MIX_BYTES];
         for(int j = 0; j < MIX_BYTES / HASH_BYTES; j++) {
-            CDAGItem item = dag.GetNode(p+j, blockToHash.nHeight);
-            memcpy(newdata + (j * HASH_BYTES), item.node, HASH_BYTES);
+            if (typeid(CDAGItemType) == typeid(CDAGItem)) {
+                CDAGItem item = dag.GetNode(p+j, blockToHash.nHeight);
+                memcpy(newdata + (j * HASH_BYTES), item.node, HASH_BYTES);
+            } else {
+                CDAGFullDerivItem item = dag.GetFullNodeDeriv(p+j, blockToHash.nHeight);
+                memcpy(newdata + (j * HASH_BYTES), item.node, HASH_BYTES);
+            }
         }
         for(int i = 0; i < MIX_BYTES; i++) {
             mix[i] = fnv(mix[i], newdata[i]);
@@ -40,3 +48,4 @@ CHashimotoResult hashimoto(CBlockHeader blockToHash) {
     return result;
 
 }
+#endif // HASHIMOTOTEMPLATEHACK_H

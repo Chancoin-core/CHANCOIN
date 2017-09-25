@@ -22,7 +22,7 @@ CONFIG += thread
 OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++1z
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
@@ -232,7 +232,8 @@ HEADERS += src/qt/bitcoingui.h \
     src/Lyra2RE/Lyra2RE.h \
     src/Lyra2RE/Lyra2.h \
     src/dag.h \
-    src/hashimoto.h
+    src/hashimoto.h \
+    src/hashimototemplatehack.h
 
 SOURCES += src/qt/bitcoin.cpp \
     src/qt/bitcoingui.cpp \
@@ -313,8 +314,7 @@ SOURCES += src/qt/bitcoin.cpp \
     src/Lyra2RE/Sponge.c \
     src/Lyra2RE/Lyra2RE.c \
     src/Lyra2RE/Lyra2.c \
-    src/dag.cpp \
-    src/hashimoto.cpp
+    src/dag.cpp
 
 RESOURCES += src/qt/bitcoin.qrc
 

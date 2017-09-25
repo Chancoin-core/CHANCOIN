@@ -114,7 +114,7 @@ public:
         return CDAGItem(i, cache[(unsigned long)floor(height/200.0)], get_cache_size(height));
     }
 
-    CDAGFullDerivItem GetFullNodeDerv(unsigned long i, unsigned long height) {
+    CDAGFullDerivItem GetFullNodeDeriv(unsigned long i, unsigned long height) {
         sph_blake256_context ctx_blake;
         static CCriticalSection cs;
         {

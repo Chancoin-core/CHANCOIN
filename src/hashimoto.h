@@ -9,6 +9,8 @@ struct CHashimotoResult {
     uint256 result;
 };
 
+template <class CDAGItemType>
 CHashimotoResult hashimoto(CBlockHeader blockToHash);
 
+#include "hashimototemplatehack.h"
 #endif // HASHIMOTO_H
