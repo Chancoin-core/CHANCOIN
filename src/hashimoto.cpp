@@ -3,7 +3,7 @@
 #include "main.h"
 
 CHashimotoResult hashimoto(CBlockHeader blockToHash) {
-    uint64_t n = floor(get_full_size(0) / HASH_BYTES);
+    uint64_t n = floor(get_full_size(blockToHash.nHeight) / HASH_BYTES);
     uint64_t w = floor(MIX_BYTES / WORD_BYTES);
     uint64_t mixhashes = MIX_BYTES / WORD_BYTES;
     std::vector<uint8_t> header;
@@ -43,7 +43,7 @@ CHashimotoResult hashimoto(CBlockHeader blockToHash) {
 }
 
 CHashimotoResult fastimoto(CBlockHeader blockToHash) {
-    uint64_t n = floor(get_full_size(0) / HASH_BYTES);
+    uint64_t n = floor(get_full_size(blockToHash.nHeight) / HASH_BYTES);
     uint64_t w = floor(MIX_BYTES / WORD_BYTES);
     uint64_t mixhashes = MIX_BYTES / WORD_BYTES;
     std::vector<uint8_t> header;
