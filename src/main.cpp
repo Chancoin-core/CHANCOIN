@@ -1332,7 +1332,7 @@ bool CheckProofOfWork(CBlock block)
 
     if(block.GetBlockHeader().nVersion > 2) {
         uint256 mixHash = block.GetBlockHeader().hashMix;
-        CHashimotoResult hash = hashimoto<CDAGItem>(block.GetBlockHeader());
+        CHashimotoResult hash = hashimoto(block.GetBlockHeader());
         if(mixHash != hash.cmix) {
             return error("CheckProofOfWork() : header does not match mixHash");
         }
@@ -2335,8 +2335,10 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
             return state.DoS(10, error("AcceptBlock() : prev block not found"));
         pindexPrev = (*mi).second;
         nHeight = pindexPrev->nHeight+1;
-        if(this->nHeight != nHeight) {
-            return state.DoS(100, error("AcceptBlock() : bad hashHeight"));
+        if(nVersion > 2) {
+            if(this->nHeight != nHeight) {
+                return state.DoS(100, error("AcceptBlock() : bad hashHeight"));
+            }
         }
         // Check proof of work
         if (nBits != GetNextWorkRequired(pindexPrev, this))
@@ -4808,7 +4810,7 @@ void static ChanCoinMiner(CWallet *pwallet)
             //char scratchpad[SCRYPT_SCRATCHPAD_SIZE];
             loop
             {
-                CHashimotoResult res = hashimoto<CDAGFullDerivItem>(pblock->GetBlockHeader());
+                CHashimotoResult res = fastimoto(pblock->GetBlockHeader());
                 //scrypt_1024_1_1_256_sp(BEGIN(pblock->nVersion), BEGIN(thash), scratchpad);
 
                 if (res.result <= hashTarget)
