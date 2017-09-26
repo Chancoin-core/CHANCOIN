@@ -89,6 +89,8 @@ private:
     std::map<size_t, char[32]> seed;
     std::map<size_t, char *> cache;
     std::map<size_t, char *> fdag;
+    unsigned long cached_ptr_epoch;
+    char *cached_fdag = NULL;
 public:
     CDAGSystem() {
         memset(seed[0], 0, 32);
@@ -115,6 +117,9 @@ public:
     }
 
     CDAGFullDerivItem GetFullNodeDeriv(unsigned long i, unsigned long height) {
+        if(((unsigned long)floor(height/200.0) == cached_ptr_epoch) && cached_fdag) {
+            return CDAGFullDerivItem(i, cached_fdag);
+        }
         sph_blake256_context ctx_blake;
         static CCriticalSection cs;
         {
@@ -133,6 +138,8 @@ public:
             if (fdag.find((unsigned long)floor(height/200.0)) == fdag.end()) {
                 fdag[(unsigned long)floor(height/200.0)] = calc_full_dataset(cache[(unsigned long)floor(height/200.0)], get_full_size(height));
             }
+            cached_ptr_epoch = (unsigned long)floor(height/200.0);
+            cached_fdag = fdag[(unsigned long)floor(height/200.0)];
         }
         return CDAGFullDerivItem(i, fdag[(unsigned long)floor(height/200.0)]);
     }
