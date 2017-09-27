@@ -142,7 +142,18 @@ OBJS= \
     obj/bloom.o \
     obj/noui.o \
     obj/leveldb.o \
-    obj/txdb.o
+    obj/txdb.o \
+    obj/dag.o \
+    obj/hashimoto.o \
+    obj/Lyra2RE/blake.o \
+    obj/Lyra2RE/keccak.o \
+    obj/Lyra2RE/Lyra2RE.o \
+    obj/Lyra2RE/Lyra2.o \
+    obj/Lyra2RE/Sponge.o \
+    obj/Lyra2RE/bmw.o \
+    obj/Lyra2RE/cubehash.o \
+    obj/Lyra2RE/skein.o \
+    obj/Lyra2RE/groestl.o
 
 
 ifdef USE_SSE2
@@ -184,6 +195,13 @@ obj/%-sse2.o: %-sse2.cpp
 
 obj/%.o: %.cpp
 	$(CXX) -c $(xCXXFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
+	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
+	  rm -f $(@:%.o=%.d)
+
+obj/Lyra2RE/%.o: Lyra2RE/%.c
+	$(CC) -c $(xCXXFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
 	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
 	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
