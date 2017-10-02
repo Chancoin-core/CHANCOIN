@@ -52,10 +52,10 @@ char *calc_dataset_item(char *cache, unsigned long i, unsigned long cache_size) 
    return mix;
 }
 
-char* calc_full_dataset(char *cache, unsigned long dataset_size) {
+char* calc_full_dataset(char *cache, unsigned long dataset_size, unsigned long cache_size) {
     char *fullset = new char[dataset_size];
     for(int i = 0; i < (floor(dataset_size / HASH_BYTES)); i++){
-        char *item = calc_dataset_item(cache, i, (dataset_size/1024));
+        char *item = calc_dataset_item(cache, i, cache_size);
         memcpy(fullset + i*32, item, 32);
         free(item);
     }

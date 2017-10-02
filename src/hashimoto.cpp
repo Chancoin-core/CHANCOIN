@@ -16,7 +16,7 @@ CHashimotoResult hashimoto(CBlockHeader blockToHash) {
         memcpy(mix + (i * HASH_BYTES), &hashedHeader, HASH_BYTES);
     }
     for(int i = 0; i < ACCESSES; i++) {
-        uint64_t p = fnv(i ^ header[0], mix[i % w]) % ((uint64_t)floor(n / mixhashes) * mixhashes);
+        uint64_t p = fnv(i ^ *(unsigned int*)hashedHeader.begin(), mix[i % w]) % ((uint64_t)floor(n / mixhashes) * mixhashes);
         uint8_t newdata[MIX_BYTES];
         for(int j = 0; j < MIX_BYTES / HASH_BYTES; j++) {
             CDAGItem item = dag.GetNode(p+j, blockToHash.nHeight);

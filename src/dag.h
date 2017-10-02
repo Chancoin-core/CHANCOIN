@@ -56,7 +56,7 @@ inline unsigned long get_full_size(unsigned long block_number) {
 
 extern char *calc_dataset_item(char *cache, unsigned long i, unsigned long cache_size);
 
-extern char* calc_full_dataset(char *cache, unsigned long dataset_size);
+extern char* calc_full_dataset(char *cache, unsigned long dataset_size, unsigned long cache_size);
 
 extern char* mkcache(unsigned long size, char* seed);
 class CDAGItem {
@@ -136,7 +136,7 @@ public:
                 cache[(unsigned long)floor(height/200.0)] = mkcache(get_cache_size(height), seed[(unsigned long)floor(height/200.0)]);
             }
             if (fdag.find((unsigned long)floor(height/200.0)) == fdag.end()) {
-                fdag[(unsigned long)floor(height/200.0)] = calc_full_dataset(cache[(unsigned long)floor(height/200.0)], get_full_size(height));
+                fdag[(unsigned long)floor(height/200.0)] = calc_full_dataset(cache[(unsigned long)floor(height/200.0)], get_full_size(height), get_cache_size(height));
             }
             cached_ptr_epoch = (unsigned long)floor(height/200.0);
             cached_fdag = fdag[(unsigned long)floor(height/200.0)];

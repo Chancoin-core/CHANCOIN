@@ -361,14 +361,15 @@ Value getwork(const Array& params, bool fHelp)
         // Update nTime
         pblock->UpdateTime(pindexPrev);
         pblock->nNonce = 0;
-
+        pblock->nHeight = pindexPrev->nHeight + 1;
         // Update nExtraNonce
         static unsigned int nExtraNonce = 0;
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
         // Save
         mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0].vin[0].scriptSig);
-
+        printf("Work given:\n");
+        pblock->print();
         // Pre-build hash buffers
         char pmidstate[32];
         char pdata[128];
@@ -376,7 +377,8 @@ Value getwork(const Array& params, bool fHelp)
         FormatHashBuffers(pblock, pmidstate, pdata, phash1);
 
         uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
-
+        printf("Encoded:\n");
+        printf((HexStr(BEGIN(pdata), END(pdata)) + "\n").c_str());
         Object result;
         result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
         result.push_back(Pair("data",     HexStr(BEGIN(pdata), END(pdata))));
@@ -401,10 +403,14 @@ Value getwork(const Array& params, bool fHelp)
             return false;
         CBlock* pblock = mapNewBlock[pdata->hashMerkleRoot].first;
 
+        printf(string("phashmix:" + hashimoto(pdata->GetBlockHeader()).cmix.GetHex() + "\n").c_str());
+
         pblock->nTime = pdata->nTime;
         pblock->nNonce = pdata->nNonce;
         pblock->vtx[0].vin[0].scriptSig = mapNewBlock[pdata->hashMerkleRoot].second;
         pblock->hashMerkleRoot = pblock->BuildMerkleTree();
+        pblock->hashMix        = pdata->hashMix;
+        pblock->nHeight        = pdata->nHeight;
 
         assert(pwalletMain != NULL);
         return CheckWork(pblock, *pwalletMain, *pMiningKey);
@@ -562,13 +568,15 @@ Value getblocktemplate(const Array& params, bool fHelp)
 
 Value submitblock(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+    if (fHelp || params.size() < 1 || params.size() > 2) {
+        printf("fugggggggggggggggggg\n");
         throw runtime_error(
             "submitblock <hex data> [optional-params-obj]\n"
             "[optional-params-obj] parameter is currently ignored.\n"
             "Attempts to submit new block to network.\n"
             "See https://en.bitcoin.it/wiki/BIP_0022 for full specification.");
-
+    }
+    printf(params[0].get_str().c_str());
     vector<unsigned char> blockData(ParseHex(params[0].get_str()));
     CDataStream ssBlock(blockData, SER_NETWORK, PROTOCOL_VERSION);
     CBlock pblock;

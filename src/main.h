@@ -1524,7 +1524,7 @@ public:
     {
         printf("CBlock(hash=%s, input=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, hashMix=%s, vtx=%" PRIszu ")\n",
             GetHash().ToString().c_str(),
-            HexStr(BEGIN(nVersion),BEGIN(nVersion)+96,false).c_str(),
+            HexStr(BEGIN(nVersion),BEGIN(nVersion)+104,false).c_str(),
             GetPoWHash().ToString().c_str(),
             nVersion,
             hashPrevBlock.ToString().c_str(),

@@ -4685,6 +4685,8 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
             unsigned int nTime;
             unsigned int nBits;
             unsigned int nNonce;
+            uint256 hashMix;
+            unsigned long nHeight;
         }
         block;
         unsigned char pchPadding0[64];
@@ -4700,6 +4702,8 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
     tmp.block.nTime          = pblock->nTime;
     tmp.block.nBits          = pblock->nBits;
     tmp.block.nNonce         = pblock->nNonce;
+    tmp.block.hashMix        = pblock->hashMix;
+    tmp.block.nHeight        = pblock->nHeight;
 
     FormatHashBlocks(&tmp.block, sizeof(tmp.block));
     FormatHashBlocks(&tmp.hash1, sizeof(tmp.hash1));
@@ -4718,7 +4722,9 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
 
 bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 {
+    pblock->print();
     uint256 hash = pblock->GetPoWHash();
+    printf((hash.GetHex() + "\n").c_str());
     uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
     if (hash > hashTarget)
@@ -4812,7 +4818,8 @@ void static ChanCoinMiner(CWallet *pwallet)
             {
                 CHashimotoResult res = fastimoto(pblock->GetBlockHeader());
                 //scrypt_1024_1_1_256_sp(BEGIN(pblock->nVersion), BEGIN(thash), scratchpad);
-
+                //assert(fastimoto(pblock->GetBlockHeader()).result == fastimoto(pblock->GetBlockHeader()).result);
+                assert(hashimoto(pblock->GetBlockHeader()).result == fastimoto(pblock->GetBlockHeader()).result);
                 if (res.result <= hashTarget)
                 {
                     // Found a solution
