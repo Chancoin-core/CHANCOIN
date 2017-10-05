@@ -27,7 +27,7 @@ inline int is_prime(unsigned long number) {
     if((number % 2 == 0) && number > 2) return false;
     for(unsigned long i = 3; i < number / 2; i += 2) {
         if(number % i == 0)
-            return true;
+            return false;
     }
     return true;
 }
