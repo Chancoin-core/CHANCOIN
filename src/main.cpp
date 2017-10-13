@@ -4814,12 +4814,12 @@ void static ChanCoinMiner(CWallet *pwallet)
 
             //uint256 thash;
             //char scratchpad[SCRYPT_SCRATCHPAD_SIZE];
+            uint64_t full_size = get_full_size(pblock->nHeight);
             loop
             {
-                CHashimotoResult res = fastimoto(pblock->GetBlockHeader());
+                CHashimotoResult res = fastimoto(pblock->GetBlockHeader(), full_size);
                 //scrypt_1024_1_1_256_sp(BEGIN(pblock->nVersion), BEGIN(thash), scratchpad);
                 //assert(fastimoto(pblock->GetBlockHeader()).result == fastimoto(pblock->GetBlockHeader()).result);
-                assert(hashimoto(pblock->GetBlockHeader()).result == fastimoto(pblock->GetBlockHeader()).result);
                 if (res.result <= hashTarget)
                 {
                     // Found a solution

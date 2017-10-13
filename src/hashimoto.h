@@ -11,5 +11,5 @@ struct CHashimotoResult {
 
 extern CHashimotoResult hashimoto(CBlockHeader blockToHash);
 
-extern CHashimotoResult fastimoto(CBlockHeader blockToHash);
+extern CHashimotoResult fastimoto(CBlockHeader blockToHash, uint64_t full_size);
 #endif // HASHIMOTO_H
