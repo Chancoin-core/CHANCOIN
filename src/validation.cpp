@@ -1019,6 +1019,9 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
+    if(nHeight == 1) {
+        return 9000000 * COIN;
+    }
     int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
     // Force block reward to zero when right shift is undefined.
     if (halvings >= 64)
@@ -2931,6 +2934,10 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     // Reject outdated version blocks when 95% (75% on testnet) of the network has upgraded:
     // check for version 2, 3 and 4 upgrades
+    std::cout << consensusParams.BIP34Height << ":" << consensusParams.BIP66Height << ":" << consensusParams.BIP65Height << std::endl;
+    std::cout << (block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) << std::endl;
+    std::cout << (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) << std::endl;
+    std::cout << (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height) << std::endl;
     if((block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) ||
        (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) ||
        (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height))
@@ -2939,7 +2946,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     if (block.nVersion < VERSIONBITS_TOP_BITS && IsWitnessEnabled(pindexPrev, consensusParams))
         return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
-                                 strprintf("rejected nVersion=0x%08x block", block.nVersion));
+                                 strprintf("witness rejected nVersion=0x%08x block", block.nVersion));
 
     return true;
 }

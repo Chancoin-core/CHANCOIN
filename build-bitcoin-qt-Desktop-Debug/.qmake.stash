@@ -1,0 +1,10 @@
+QMAKE_DEFAULT_INCDIRS = \
+    /usr/include/c++/6.3.1 \
+    /usr/include/c++/6.3.1/x86_64-redhat-linux \
+    /usr/include/c++/6.3.1/backward \
+    /usr/local/include \
+    /usr/lib64/clang/3.9.1/include \
+    /usr/include
+QMAKE_DEFAULT_LIBDIRS = \
+    /lib \
+    /usr/lib
