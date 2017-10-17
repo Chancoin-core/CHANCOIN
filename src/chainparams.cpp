@@ -172,7 +172,7 @@ public:
         consensus.nPowTargetTimespan = 10 * 60; // 3.5 days
         consensus.nPowTargetSpacing = 5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
-        consensus.fPowNoRetargeting = false;
+        consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
         /*consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
