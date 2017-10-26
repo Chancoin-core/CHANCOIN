@@ -27,6 +27,8 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    uint128 hashMix;
+    int32_t height;
 
     CBlockHeader()
     {
@@ -43,6 +45,10 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        if(this->nVersion & 0x00010000) {
+            READWRITE(hashMix);
+            READWRITE(height);
+        }
     }
 
     void SetNull()
@@ -53,6 +59,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        hashMix.SetNull();
+        height = 0;
     }
 
     bool IsNull() const
@@ -115,6 +123,8 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.hashMix        = hashMix;
+        block.height         = height;
         return block;
     }
 
