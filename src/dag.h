@@ -1,9 +1,11 @@
 #ifndef DAG_H
 #define DAG_H
 
-#include "sync.h"
-
 #include <map>
+
+class CBlockHeader;
+class uint128;
+class uint256;
 
 class CDAGNode {
 private:
@@ -18,9 +20,22 @@ public:
 
 };
 
+class CHashimotoResult {
+private:
+    uint128 cmix;
+    uint256 result;
+public:
+    CHashimotoResult(uint128 cmix, uint256 result);
+
+    uint128 GetCmix();
+
+    uint256 GetResult();
+};
+
 class CDAGSystem {
 private:
     /** Constants */
+    const uint32_t WORD_BYTES = 4;
     const uint32_t DATASET_BYTES_INIT = 536870912;
     const uint32_t DATASET_BYTES_GROWTH = 12582912;
     const uint32_t CACHE_BYTES_INIT = 8388608;
@@ -46,9 +61,6 @@ private:
     /** Get graph size from epoch */
     uint64_t GetGraphSize(uint64_t epoch);
 
-    /** Get graph node from cache */
-    CDAGNode DeriveGraphNode(uint64_t epoch, uint64_t i);
-
     /** Caches cache seeds in case of a need for regeneration */
     std::map<size_t, std::array<uint8_t, 32>> seedCache;
     /** Caches caches to verify blocks */
@@ -63,9 +75,10 @@ private:
     /** Populates graph of the epoch's epoch */
     void PopulateGraphEpoch(uint64_t epoch);
 
-    /** Actually creates a graph from seed and size data */
+    /** Actually creates a cache from seed and size data */
     void CreateCacheInPlace(uint64_t epoch);
 
+    /** Actually creates a graph from a cache */
     void CreateGraphInPlace(uint64_t epoch);
 
 public:
@@ -77,6 +90,10 @@ public:
      */
     CDAGNode GetNodeFromGraph(uint64_t i, int32_t height);
 
+    /** Runs the hashimoto function on header using the cache */
+    CHashimotoResult Hashimoto(CBlockHeader header);
+
+    CHashimotoResult FastHashimoto(CBlockHeader header);
 };
 
 #endif // DAG_H

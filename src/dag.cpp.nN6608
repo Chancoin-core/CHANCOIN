@@ -48,7 +48,7 @@ void CDAGSystem::PopulateSeedEpoch(uint64_t epoch) {
             //Repeatedly hashes (seed_epoch - start_epoch) times
             sph_blake256_context ctx;
             sph_blake256_init(&ctx);
-            sph_blake256(&ctx, seedCache[epoch].data(), this->HASH_BYTES);
+            sph_blake256(&ctx, seedCache[epoch].data(), 32);
             sph_blake256_close(&ctx,seedCache[epoch].data());
         }
     }
@@ -150,7 +150,7 @@ CDAGNode CDAGSystem::GetNode(uint64_t i, int32_t height) {
     PopulateCacheEpoch(epoch);
     uint64_t items = GetCacheSize(epoch) / this->HASH_BYTES;
     uint64_t hashwords = this->HASH_BYTES / this->WORD_BYTES;
-    uint8_t *mix = new uint8_t[32];
+    uint8_t *mix = new uint8_t[this->HASH_BYTES];
     std::copy(this->cacheCache[epoch].begin() + (i % items)*this->HASH_BYTES, this->cacheCache[epoch].begin() + (((i % items)*this->HASH_BYTES)+this->HASH_BYTES), mix);
     mix[0] ^= i;
     sph_blake256_init(&ctx);
@@ -181,25 +181,15 @@ CBlockHeader CDAGSystem::Hashimoto(CBlockHeader header) {
     uint64_t items = GetGraphSize(epoch) / this->HASH_BYTES;
     uint64_t wordhashes = this->MIX_BYTES / this->WORD_BYTES;
     uint64_t mixhashes = this->MIX_BYTES / this->HASH_BYTES;
-    uint8_t hashedheader[this->HASH_BYTES];
+    uint8_t hashedheader[HASH_BYTES];
     uint8_t mix[this->MIX_BYTES];
-    uint8_t cmix[this->MIX_BYTES / this->WORD_BYTES];
     lyra2re2_hash(&header,&hashedheader);
     for(uint64_t i = 0; i < mixhashes; i++) {
         std::copy(hashedheader, hashedheader + this->HASH_BYTES, mix + (i * this->HASH_BYTES));
     }
 
-    for(uint64_t i = 0; i < this->ACCESSES; i++) {
+    for(uint64_t i = 0; i < ACCESSES; i++) {
         uint32_t target = fnv(i ^ *(unsigned int*)hashedheader, mix[i % wordhashes]) % (items / mixhashes) * mixhashes;
-        for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
-            CDAGNode node = GetNode(target + mixhash, header.height);
-            for(uint64_t byte = 0; byte < this->HASH_BYTES; byte++) {
-                mix[(mixhash * this->HASH_BYTES) + byte] = fnv(mix[(mixhash * this->HASH_BYTES) + byte], node.GetNodePtr()[(mixhash * this->HASH_BYTES) + byte]);
-            }
-        }
-    }
-
-    for(uint64_t i = 0; i < 64; i++) {
-        cmix[i/4] = fnv()
+        uint8_t newdata[th0]
     }
 }
