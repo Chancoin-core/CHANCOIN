@@ -199,7 +199,53 @@ CBlockHeader CDAGSystem::Hashimoto(CBlockHeader header) {
         }
     }
 
-    for(uint64_t i = 0; i < 64; i++) {
-        cmix[i/4] = fnv()
+    for(uint64_t i = 0; i < this->MIX_BYTES; i++) {
+        cmix[i/4] = fnv(fnv(fnv(mix[i], mix[i+1]), mix[i+2]), mix[i+3]);
     }
+    uint128 cmix_res;
+    uint256 result;
+    std::copy(cmix, cmix + (this->MIX_BYTES / 4), cmix_res.begin());
+    std::array<uint8_t, this->HEADER_BYTES> finalhash;
+    std::copy(hashedheader, hashedheader + this->HASH_BYTES, finalhash.begin());
+    std::copy(&header.height, &header.height + sizeof(int32_t), finalhash.begin() + this->HASH_BYTES);
+    std::copy(cmix, cmix + (this->MIX_BYTES / 4), finalhash.begin() + this->HASH_BYTES + sizeof(int32_t));
+    lyra2re2_hash104(finalhash.data(), result.begin());
+    return CHashimotoResult(cmix_res, result);
+}
+
+CBlockHeader CDAGSystem::FastHashimoto(CBlockHeader header) {
+    uint64_t epoch = header.height / this->EPOCH_LENGTH;
+    uint64_t items = GetGraphSize(epoch) / this->HASH_BYTES;
+    uint64_t wordhashes = this->MIX_BYTES / this->WORD_BYTES;
+    uint64_t mixhashes = this->MIX_BYTES / this->HASH_BYTES;
+    uint8_t hashedheader[this->HASH_BYTES];
+    uint8_t mix[this->MIX_BYTES];
+    uint8_t cmix[this->MIX_BYTES / this->WORD_BYTES];
+    lyra2re2_hash(&header,&hashedheader);
+    for(uint64_t i = 0; i < mixhashes; i++) {
+        std::copy(hashedheader, hashedheader + this->HASH_BYTES, mix + (i * this->HASH_BYTES));
+    }
+
+    for(uint64_t i = 0; i < this->ACCESSES; i++) {
+        uint32_t target = fnv(i ^ *(unsigned int*)hashedheader, mix[i % wordhashes]) % (items / mixhashes) * mixhashes;
+        for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
+            CDAGNode node = GetNodeFromGraph(target + mixhash, header.height);
+            for(uint64_t byte = 0; byte < this->HASH_BYTES; byte++) {
+                mix[(mixhash * this->HASH_BYTES) + byte] = fnv(mix[(mixhash * this->HASH_BYTES) + byte], node.GetNodePtr()[(mixhash * this->HASH_BYTES) + byte]);
+            }
+        }
+    }
+
+    for(uint64_t i = 0; i < this->MIX_BYTES; i++) {
+        cmix[i/4] = fnv(fnv(fnv(mix[i], mix[i+1]), mix[i+2]), mix[i+3]);
+    }
+    uint128 cmix_res;
+    uint256 result;
+    std::copy(cmix, cmix + (this->MIX_BYTES / 4), cmix_res.begin());
+    std::array<uint8_t, this->HEADER_BYTES> finalhash;
+    std::copy(hashedheader, hashedheader + this->HASH_BYTES, finalhash.begin());
+    std::copy(&header.height, &header.height + sizeof(int32_t), finalhash.begin() + this->HASH_BYTES);
+    std::copy(cmix, cmix + (this->MIX_BYTES / 4), finalhash.begin() + this->HASH_BYTES + sizeof(int32_t));
+    lyra2re2_hash104(finalhash.data(), result.begin());
+    return CHashimotoResult(cmix_res, result);
 }

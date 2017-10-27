@@ -109,7 +109,7 @@ void lyra2re2_hash(const char* input, char* output)
    	memcpy(output, hashA, 32);
 }
 
-void lyra2re2_hash104(const char* input, char* output)
+void lyra2re2_hash56(const char* input, char* output)
 {
     sph_blake256_context ctx_blake;
     sph_cubehash256_context ctx_cubehash;
@@ -120,7 +120,7 @@ void lyra2re2_hash104(const char* input, char* output)
     uint32_t hashA[8], hashB[8];
 
     sph_blake256_init(&ctx_blake);
-    sph_blake256(&ctx_blake, input, 104);
+    sph_blake256(&ctx_blake, input, 56);
     sph_blake256_close (&ctx_blake, hashA);
 
     sph_keccak256_init(&ctx_keccak);

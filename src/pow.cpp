@@ -10,6 +10,7 @@
 #include "primitives/block.h"
 #include "uint256.h"
 #include "util.h"
+#include "crypto/dag.h"
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
@@ -93,7 +94,13 @@ bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params)
     bool fNegative;
     bool fOverflow;
     arith_uint256 bnTarget;
-
+    CDAGSystem sys;
+    if(this->nVersion & 0x00010000) {
+        CHashimotoResult res = sys.Hashimoto(header);
+        if(header.hashMix != res.GetCmix()) {
+            return false;
+        }
+    }
     bnTarget.SetCompact(header.nBits, &fNegative, &fOverflow);
 
     // Check range

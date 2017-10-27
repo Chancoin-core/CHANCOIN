@@ -41,6 +41,8 @@ src/crypto/aes.h
 src/crypto/chacha20.cpp
 src/crypto/chacha20.h
 src/crypto/common.h
+src/crypto/dag.cpp
+src/crypto/dag.h
 src/crypto/hmac_sha256.cpp
 src/crypto/hmac_sha256.h
 src/crypto/hmac_sha512.cpp
@@ -720,7 +722,6 @@ src/versionbits.cpp
 src/versionbits.h
 src/warnings.cpp
 src/warnings.h
-src/dag.h
 src/dag.cpp
 src/crypto/blake.c
 src/crypto/Sponge.h
