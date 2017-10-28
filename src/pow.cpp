@@ -95,7 +95,7 @@ bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params)
     bool fOverflow;
     arith_uint256 bnTarget;
     CDAGSystem sys;
-    if(this->nVersion & 0x00010000) {
+    if(header.nVersion & 0x80000000) {
         CHashimotoResult res = sys.Hashimoto(header);
         if(header.hashMix != res.GetCmix()) {
             return false;

@@ -3,10 +3,9 @@
 
 #include <map>
 #include <vector>
+#include "uint256.h"
 
 class CBlockHeader;
-class uint128;
-class uint256;
 
 class CDAGNode {
 private:

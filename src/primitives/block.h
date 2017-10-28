@@ -45,7 +45,7 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-        if(this->nVersion & 0x00010000) {
+        if(this->nVersion & 0x00000100) {
             READWRITE(hashMix);
             READWRITE(height);
         }
