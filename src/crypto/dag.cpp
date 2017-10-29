@@ -5,8 +5,8 @@
 #include "primitives/block.h"
 
 CDAGNode::CDAGNode(uint8_t *ptr, bool fGraphDerived) {
-    ptr = ptr;
-    fGraphDerived = fGraphDerived;
+    this->ptr = ptr;
+    this->fGraphDerived = fGraphDerived;
 }
 
 uint8_t *CDAGNode::GetNodePtr() {
@@ -44,6 +44,7 @@ void CDAGSystem::PopulateSeedEpoch(uint64_t epoch) {
     {
         LOCK(cs);
         //Finds largest epoch, populates seed from it.
+        seedCache[0];
         uint64_t epoch_latest = seedCache.rbegin()->first;
         uint64_t start_epoch = ((epoch - epoch_latest) > epoch) ? 0 : epoch_latest;
         seedCache[epoch] = seedCache[start_epoch];
@@ -77,14 +78,19 @@ bool CDAGSystem::is_prime(uint64_t num) {
 uint64_t CDAGSystem::GetCacheSize(uint64_t epoch) {
     uint64_t size = CACHE_BYTES_INIT + (CACHE_BYTES_GROWTH * round(sqrt(6*epoch)));
     size -= HASH_BYTES;
-    while(!is_prime(size)) {
+    while(!is_prime(size / HASH_BYTES)) {
         size -= MIX_BYTES;
     }
     return size;
 }
 
 uint64_t CDAGSystem::GetGraphSize(uint64_t epoch) {
-    return GetCacheSize(epoch) * CACHE_MULTIPLIER;
+    uint64_t size = DATASET_BYTES_INIT + (DATASET_BYTES_GROWTH * round(sqrt(6*epoch)));
+    size -= MIX_BYTES;
+    while(!is_prime(size / MIX_BYTES)) {
+        size -= 2 * MIX_BYTES;
+    }
+    return size;
 }
 
 void CDAGSystem::CreateCacheInPlace(uint64_t epoch) {
@@ -153,7 +159,7 @@ CDAGNode CDAGSystem::GetNode(uint64_t i, int32_t height) {
     PopulateCacheEpoch(epoch);
     uint64_t items = GetCacheSize(epoch) / HASH_BYTES;
     uint64_t hashwords = HASH_BYTES / WORD_BYTES;
-    uint8_t *mix = new uint8_t[32];
+    uint8_t *mix = new uint8_t[HASH_BYTES];
     std::copy(cacheCache[epoch].begin() + (i % items)*HASH_BYTES, cacheCache[epoch].begin() + (((i % items)*HASH_BYTES)+HASH_BYTES), mix);
     mix[0] ^= i;
     sph_blake256_init(&ctx);
@@ -168,8 +174,8 @@ CDAGNode CDAGSystem::GetNode(uint64_t i, int32_t height) {
     sph_blake256_init(&ctx);
     sph_blake256(&ctx, mix, HASH_BYTES);
     sph_blake256_close(&ctx, mix);
-    CDAGNode node(mix, false);
-    return node;
+    std::cout << (uint64_t)mix << std::endl;
+    return CDAGNode(mix, false);
 }
 
 CDAGNode CDAGSystem::GetNodeFromGraph(uint64_t i, int32_t height) {
@@ -197,7 +203,11 @@ CHashimotoResult CDAGSystem::Hashimoto(CBlockHeader header) {
         for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
             CDAGNode node = GetNode(target + mixhash, header.height);
             for(uint64_t byte = 0; byte < HASH_BYTES; byte++) {
-                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], node.GetNodePtr()[(mixhash * HASH_BYTES) + byte]);
+                std::cout << (uint64_t)node.GetNodePtr() << std::endl;
+                *node.GetNodePtr() += 1;
+                std::cout << mixhash << std::endl;
+                std::cout << byte << std::endl;
+                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], *(node.GetNodePtr() + (mixhash * HASH_BYTES) + byte));
             }
         }
     }
@@ -234,7 +244,7 @@ CHashimotoResult CDAGSystem::FastHashimoto(CBlockHeader header) {
         for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
             CDAGNode node = GetNodeFromGraph(target + mixhash, header.height);
             for(uint64_t byte = 0; byte < HASH_BYTES; byte++) {
-                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], node.GetNodePtr()[(mixhash * HASH_BYTES) + byte]);
+                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], *(node.GetNodePtr() + (mixhash * HASH_BYTES) + byte));
             }
         }
     }
