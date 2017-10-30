@@ -2292,6 +2292,14 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
         uint256 hashLastBlock;
         for (const CBlockHeader& header : headers) {
+            std::cout << "Header of clblock: " << std::endl
+                      << "Version: " << header.nVersion << std::endl
+                      << "Merkle root: " << header.hashMerkleRoot.ToString() << std::endl
+                      << "Prevhash: " << header.hashPrevBlock.ToString() << std::endl
+                      << "Ntime: " << header.nTime << std::endl
+                      << "Nonce: " << header.nNonce << std::endl
+                      << "Mixhash: " << header.hashMix.ToString() << std::endl
+                      << "clheight: " << header.height << std::endl;
             if (!hashLastBlock.IsNull() && header.hashPrevBlock != hashLastBlock) {
                 Misbehaving(pfrom->GetId(), 20);
                 return error("non-continuous headers sequence");
