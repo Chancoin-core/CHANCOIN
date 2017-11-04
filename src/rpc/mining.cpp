@@ -25,6 +25,7 @@
 #include "utilstrencodings.h"
 #include "validationinterface.h"
 #include "warnings.h"
+#include "crypto/dag.h"
 
 #include <memory>
 #include <stdint.h>
@@ -120,6 +121,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
     UniValue blockHashes(UniValue::VARR);
     while (nHeight < nHeightEnd)
     {
+        int64_t nStart = GetTimeMillis();
         std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(coinbaseScript->reserveScript));
         if (!pblocktemplate.get())
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
@@ -129,15 +131,22 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
             LOCK(cs_main);
             IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
         }
-        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetBlockHeader(), Params().GetConsensus())) {
+        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetBlockHeader(), Params().GetConsensus(), true, true)) {
             ++pblock->nNonce;
             --nMaxTries;
         }
+        int64_t nNow = GetTimeMillis();
+        LogPrintf("%6.0f thousand hashes per second\n", nInnerLoopCount/((nNow - nStart)/1000.0));
         if (nMaxTries == 0) {
             break;
         }
         if (pblock->nNonce == nInnerLoopCount) {
             continue;
+        }
+        if(pblock->nVersion & 0x00000100) {
+            CDAGSystem sys;
+            CHashimotoResult res = sys.FastHashimoto(pblock->GetBlockHeader());
+            pblock->hashMix = res.GetCmix();
         }
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
         if (!ProcessNewBlock(Params(), shared_pblock, true, nullptr))

@@ -40,8 +40,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(this->nVersion);
-        std::cout << this->nVersion << std::endl;
+        READWRITE(this->nVersion);;
         READWRITE(hashPrevBlock);
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);

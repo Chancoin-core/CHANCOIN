@@ -172,24 +172,31 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
     return bnNew.GetCompact();
 }
 
-bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params)
+bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params, bool fFast, bool fNoCheckHashMix)
 {
     bool fNegative;
     bool fOverflow;
     arith_uint256 bnTarget;
     CDAGSystem sys;
-    if(header.nVersion & 0x00000100) {
-        CHashimotoResult res = sys.Hashimoto(header);
-        std::cout << header.nVersion << std::endl;
-        if(header.hashMix != res.GetCmix()) {
-            return false;
-        }
-    }
     bnTarget.SetCompact(header.nBits, &fNegative, &fOverflow);
 
     // Check range
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
         return false;
+
+    if (header.nVersion & 0x00000100) {
+        if (!fFast) {
+            CHashimotoResult res = sys.Hashimoto(header);
+            if (header.hashMix != res.GetCmix() && !fNoCheckHashMix)
+                return false;
+        } else {
+            CHashimotoResult res = sys.FastHashimoto(header);
+            if (header.hashMix != res.GetCmix() && !fNoCheckHashMix)
+                return false;
+            if (UintToArith256(res.GetResult()) > bnTarget)
+                return false;
+        }
+    }
 
     // Check proof of work matches claimed amount
     if (UintToArith256(header.GetPoWHash()) > bnTarget)

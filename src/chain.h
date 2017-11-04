@@ -419,7 +419,6 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
         if(nVersion & 0x00000100) {
-            std::cout << this->nVersion << std::endl;
             READWRITE(hashMix);
             READWRITE(height);
         }

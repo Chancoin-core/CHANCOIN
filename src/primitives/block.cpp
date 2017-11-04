@@ -22,7 +22,6 @@ uint256 CBlockHeader::GetPoWHash() const
     uint256 thash;
     CDAGSystem sys;
     if(this->nVersion & 0x00000100) {
-        std::cout << this->nVersion << std::endl;
         CHashimotoResult res = sys.Hashimoto(*this);
         return res.GetResult();
     }
