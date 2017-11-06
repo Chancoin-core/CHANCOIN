@@ -195,6 +195,8 @@ bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params, bool
                 return false;
             if (UintToArith256(res.GetResult()) > bnTarget)
                 return false;
+            else
+                return true;
         }
     }
 

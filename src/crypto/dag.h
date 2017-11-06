@@ -42,7 +42,7 @@ private:
     static const uint32_t CACHE_BYTES_GROWTH = 196608;
     static const uint32_t EPOCH_LENGTH = 400;
     static const uint32_t CACHE_MULTIPLIER = 64;
-    static const uint32_t HEADER_BYTES = 56;
+    static const uint32_t HEADER_BYTES = 52;
     static const uint32_t MIX_BYTES = 64;
     static const uint32_t HASH_BYTES = 32;
     static const uint32_t DATASET_PARENTS = 256;
@@ -96,6 +96,8 @@ public:
 
     /** Runs the hashimoto function on header using the graph */
     static CHashimotoResult FastHashimoto(CBlockHeader header);
+
+    static CHashimotoResult lastwork;
 };
 
 #endif // DAG_H

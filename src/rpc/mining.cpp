@@ -136,7 +136,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
             --nMaxTries;
         }
         int64_t nNow = GetTimeMillis();
-        LogPrintf("%6.0f thousand hashes per second\n", nInnerLoopCount/((nNow - nStart)/1000.0));
+        LogPrintf("%6.0f thousand hashes per second\n", nInnerLoopCount/((nNow - nStart)/1000.0)/1000.0);
         if (nMaxTries == 0) {
             break;
         }
@@ -145,7 +145,12 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
         }
         if(pblock->nVersion & 0x00000100) {
             CDAGSystem sys;
+            std::cout << sys.lastwork.GetResult().ToString() << " " << sys.lastwork.GetCmix().ToString() << std::endl;
             CHashimotoResult res = sys.FastHashimoto(pblock->GetBlockHeader());
+            CHashimotoResult res2 = sys.Hashimoto(pblock->GetBlockHeader());
+            std::cout << res.GetResult().ToString() << " " << res.GetCmix().ToString() << std::endl;
+            std::cout << res2.GetResult().ToString() << " " << res2.GetCmix().ToString() << std::endl;
+            //assert(UintToArith256(sys.FastHashimoto(pblock->GetBlockHeader()).GetResult()) == UintToArith256(sys.Hashimoto(pblock->GetBlockHeader()).GetResult()));
             pblock->hashMix = res.GetCmix();
         }
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);

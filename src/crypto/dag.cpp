@@ -35,7 +35,7 @@ uint256 CHashimotoResult::GetResult() {
 std::map<size_t, std::array<uint8_t, 32>> CDAGSystem::seedCache = std::map<size_t, std::array<uint8_t, 32>>();
 std::map<size_t, std::vector<uint8_t>> CDAGSystem::cacheCache = std::map<size_t, std::vector<uint8_t>>();
 std::map<size_t, std::vector<uint8_t>> CDAGSystem::graphCache = std::map<size_t, std::vector<uint8_t>>();
-
+CHashimotoResult CDAGSystem::lastwork = CHashimotoResult(uint128(), uint256());
 void CDAGSystem::PopulateSeedEpoch(uint64_t epoch) {
     if(!(seedCache.find(epoch) == seedCache.end())){
         return;
@@ -44,7 +44,7 @@ void CDAGSystem::PopulateSeedEpoch(uint64_t epoch) {
     {
         LOCK(cs);
         //Finds largest epoch, populates seed from it.
-        seedCache[0];
+        seedCache[0].fill(0);
         uint64_t epoch_latest = seedCache.rbegin()->first;
         uint64_t start_epoch = ((epoch - epoch_latest) > epoch) ? 0 : epoch_latest;
         seedCache[epoch] = seedCache[start_epoch];
@@ -187,7 +187,7 @@ CDAGNode CDAGSystem::GetNode(uint64_t i, int32_t height) {
 CDAGNode CDAGSystem::GetNodeFromGraph(uint64_t i, int32_t height) {
     uint64_t epoch = height / EPOCH_LENGTH;
     PopulateGraphEpoch(epoch);
-    CDAGNode node(graphCache[epoch].data() + (i*HASH_BYTES), true);
+    CDAGNode node(graphCache[epoch].data() + (i * HASH_BYTES), true);
     return node;
 }
 
@@ -209,7 +209,7 @@ CHashimotoResult CDAGSystem::Hashimoto(CBlockHeader header) {
         for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
             CDAGNode node = GetNode(target + mixhash, header.height);
             for(uint64_t byte = 0; byte < HASH_BYTES; byte++) {
-                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], *(node.GetNodePtr() + (mixhash * HASH_BYTES) + byte));
+                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], node.GetNodePtr()[byte]);
             }
         }
     }
@@ -219,13 +219,13 @@ CHashimotoResult CDAGSystem::Hashimoto(CBlockHeader header) {
     }
     uint128 cmix_res;
     uint256 result;
-    std::copy(cmix, cmix + (MIX_BYTES / 4), cmix_res.begin());
+    std::copy(cmix, cmix + (MIX_BYTES / WORD_BYTES), cmix_res.begin());
     std::array<uint8_t, HEADER_BYTES> finalhash;
     std::copy(hashedheader, hashedheader + HASH_BYTES, finalhash.begin());
-    std::copy(&header.height, &header.height + sizeof(int32_t), finalhash.begin() + HASH_BYTES);
-    std::copy(cmix, cmix + (MIX_BYTES / 4), finalhash.begin() + HASH_BYTES + sizeof(int32_t));
-    lyra2re2_hash56((char*)finalhash.data(), (char*)result.begin());
-    return CHashimotoResult(cmix_res, result);
+    std::copy(((uint8_t*)&header.height), ((uint8_t*)&header.height) + WORD_BYTES, finalhash.begin() + HASH_BYTES);
+    std::copy(cmix, cmix + (MIX_BYTES / WORD_BYTES), finalhash.begin() + HASH_BYTES + WORD_BYTES);
+    lyra2re2_hash52((char*)finalhash.data(), (char*)result.begin());
+    return lastwork = CHashimotoResult(cmix_res, result);
 }
 
 CHashimotoResult CDAGSystem::FastHashimoto(CBlockHeader header) {
@@ -246,7 +246,7 @@ CHashimotoResult CDAGSystem::FastHashimoto(CBlockHeader header) {
         for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
             CDAGNode node = GetNodeFromGraph(target + mixhash, header.height);
             for(uint64_t byte = 0; byte < HASH_BYTES; byte++) {
-                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], *(node.GetNodePtr() + (mixhash * HASH_BYTES) + byte));
+                mix[(mixhash * HASH_BYTES) + byte] = fnv(mix[(mixhash * HASH_BYTES) + byte], node.GetNodePtr()[byte]);
             }
         }
     }
@@ -259,8 +259,8 @@ CHashimotoResult CDAGSystem::FastHashimoto(CBlockHeader header) {
     std::copy(cmix, cmix + (MIX_BYTES / WORD_BYTES), cmix_res.begin());
     std::array<uint8_t, HEADER_BYTES> finalhash;
     std::copy(hashedheader, hashedheader + HASH_BYTES, finalhash.begin());
-    std::copy(&header.height, &header.height + sizeof(int32_t), finalhash.begin() + HASH_BYTES);
-    std::copy(cmix, cmix + (MIX_BYTES / WORD_BYTES), finalhash.begin() + HASH_BYTES + sizeof(int32_t));
-    lyra2re2_hash56((char*)finalhash.data(), (char*)result.begin());
-    return CHashimotoResult(cmix_res, result);
+    std::copy(((uint8_t*)&header.height), ((uint8_t*)&header.height) + WORD_BYTES, finalhash.begin() + HASH_BYTES);
+    std::copy(cmix, cmix + (MIX_BYTES / WORD_BYTES), finalhash.begin() + HASH_BYTES + WORD_BYTES);
+    lyra2re2_hash52((char*)finalhash.data(), (char*)result.begin());
+    return lastwork = CHashimotoResult(cmix_res, result);
 }
