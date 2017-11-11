@@ -9,12 +9,12 @@ class CBlockHeader;
 
 class CDAGNode {
 private:
-    uint8_t *ptr;
+    uint32_t *ptr;
     bool fGraphDerived;
 public:
-    CDAGNode(uint8_t *ptr, bool fGraphDerived);
+    CDAGNode(uint32_t *ptr, bool fGraphDerived);
 
-    uint8_t* GetNodePtr();
+    uint32_t* GetNodePtr();
 
     ~CDAGNode();
 
@@ -65,9 +65,9 @@ private:
     /** Caches cache seeds in case of a need for regeneration */
     static std::map<size_t, std::array<uint8_t, 32>> seedCache;
     /** Caches caches to verify blocks */
-    static std::map<size_t, std::vector<uint8_t>> cacheCache;
+    static std::map<size_t, std::vector<uint32_t>> cacheCache;
     /** Caches dags to generate blocks faster */
-    static std::map<size_t, std::vector<uint8_t>> graphCache;
+    static std::map<size_t, std::vector<uint32_t>> graphCache;
 
     /** Populates seed of the epoch's epoch. */
     static void PopulateSeedEpoch(uint64_t epoch);
