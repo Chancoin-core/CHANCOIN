@@ -3,6 +3,7 @@
 #include "crypto/Lyra2RE.h"
 #include "sync.h"
 #include "primitives/block.h"
+#include <fstream>
 
 CDAGNode::CDAGNode(uint32_t *ptr, bool fGraphDerived) {
     this->ptr = ptr;
@@ -77,7 +78,7 @@ bool CDAGSystem::is_prime(uint64_t num) {
 
 uint64_t CDAGSystem::GetCacheSize(uint64_t epoch) {
     if(!cacheCache[epoch].empty())
-        return cacheCache[epoch].size();
+        return cacheCache[epoch].size() * sizeof(uint32_t);
     uint64_t size = CACHE_BYTES_INIT + (CACHE_BYTES_GROWTH * round(sqrt(6*epoch)));
     size -= HASH_BYTES;
     while(!is_prime(size / HASH_BYTES)) {
@@ -88,7 +89,7 @@ uint64_t CDAGSystem::GetCacheSize(uint64_t epoch) {
 
 uint64_t CDAGSystem::GetGraphSize(uint64_t epoch) {
     if(!graphCache[epoch].empty())
-        return graphCache[epoch].size();
+        return graphCache[epoch].size() * sizeof(uint32_t);
     uint64_t size = DATASET_BYTES_INIT + (DATASET_BYTES_GROWTH * round(sqrt(6*epoch)));
     size -= MIX_BYTES;
     while(!is_prime(size / MIX_BYTES)) {
@@ -98,31 +99,39 @@ uint64_t CDAGSystem::GetGraphSize(uint64_t epoch) {
 }
 
 void CDAGSystem::CreateCacheInPlace(uint64_t epoch) {
+    PopulateSeedEpoch(epoch);
     uint64_t size = GetCacheSize(epoch);
-    cacheCache[epoch].resize(size / WORD_BYTES, 0);
     uint64_t items = size / HASH_BYTES;
-    uint64_t hashwords = HASH_BYTES / WORD_BYTES;
+    cacheCache[epoch].resize(size / sizeof(uint32_t), 0);
     sph_blake256_context ctx;
     sph_blake256_init(&ctx);
     sph_blake256(&ctx, seedCache[epoch].data(), HASH_BYTES);
     sph_blake256_close(&ctx, cacheCache[epoch].data());
-    for(uint64_t i = 0; i < (items - 1); i++) {
+    //First 32 bytes of cache are written to with hash of seed.
+    for(uint64_t i = 1; i < items; i++){
+        //Hash last item of the cache repeatedly the generate all items.
+        uint8_t hasheditem[HASH_BYTES];
         sph_blake256_init(&ctx);
-        sph_blake256(&ctx, cacheCache[epoch].data() + (i * (hashwords)), HASH_BYTES);
-        sph_blake256_close(&ctx, cacheCache[epoch].data() + (i+1)*hashwords);
+        sph_blake256(&ctx, cacheCache[epoch].data() + (i - 1)*(HASH_BYTES / sizeof(uint32_t)), HASH_BYTES);
+        sph_blake256_close(&ctx, hasheditem);
+        std::memcpy(cacheCache[epoch].data() + i*(HASH_BYTES / sizeof(uint32_t)), hasheditem, HASH_BYTES);
     }
-
-    for(uint32_t rounds = 0; rounds < CACHE_ROUNDS; rounds++) {
-        for(uint32_t i = 0; i < items; i++) {
-            uint32_t item[hashwords];
-            uint64_t current = ((i - 1 + items) % items);
-            uint64_t target = cacheCache[epoch][i*hashwords] % items;
-            for(uint64_t byte = 0; byte < hashwords; byte++) {
-                item[byte] = cacheCache[epoch][(current * hashwords) + byte] ^ cacheCache[epoch][(target * hashwords) + byte];
+    for(uint64_t round = 0; round < CACHE_ROUNDS; round++) {
+        //3 round randmemohash.
+        for(uint64_t i = 0; i < items; i++) {
+            uint64_t target = cacheCache[epoch][(i * (HASH_BYTES / sizeof(uint32_t)))] % items;
+            uint64_t mapper = (i - 1 + items) % items;
+            /* Map target onto mapper, hash it,
+             * then replace the current cache item with the 32 byte result. */
+            uint32_t item[HASH_BYTES / sizeof(uint32_t)];
+            for(uint64_t dword = 0; dword < (HASH_BYTES / sizeof(uint32_t)); dword++) {
+                item[dword] = cacheCache[epoch][(mapper * (HASH_BYTES / sizeof(uint32_t))) + dword]
+                            ^ cacheCache[epoch][(target * (HASH_BYTES / sizeof(uint32_t))) + dword];
             }
             sph_blake256_init(&ctx);
             sph_blake256(&ctx, item, HASH_BYTES);
-            sph_blake256_close(&ctx, cacheCache[epoch].data() + (i * hashwords));
+            sph_blake256_close(&ctx, item);
+            std::memcpy(cacheCache[epoch].data() + (i * (HASH_BYTES / sizeof(uint32_t))), item, HASH_BYTES);
         }
     }
 }
@@ -132,7 +141,7 @@ void CDAGSystem::CreateGraphInPlace(uint64_t epoch) {
     graphCache[epoch].resize(items * (HASH_BYTES / WORD_BYTES), 0);
     for(uint64_t i = 0; i < items; i++) {
         CDAGNode node = GetNode(i, epoch*EPOCH_LENGTH);
-        std::copy((uint8_t*)node.GetNodePtr(), (uint8_t*)node.GetNodePtr() + HASH_BYTES, (uint8_t*)graphCache[epoch].data() + (i * (HASH_BYTES)));
+        memcpy(graphCache[epoch].data() + (i * (HASH_BYTES / sizeof(uint32_t))), node.GetNodePtr(), HASH_BYTES);
     }
 }
 
@@ -166,18 +175,16 @@ CDAGNode CDAGSystem::GetNode(uint64_t i, int32_t height) {
     uint64_t epoch = height / EPOCH_LENGTH;
     PopulateCacheEpoch(epoch);
     uint64_t items = GetCacheSize(epoch) / HASH_BYTES;
-    uint64_t hashwords = HASH_BYTES / WORD_BYTES;
-    uint32_t *mix = new uint32_t[hashwords];
-    std::memcpy(mix, cacheCache[epoch].data() + (i % items)*(HASH_BYTES), 32);
-    //std::copy((uint8_t*)(cacheCache[epoch].data()) + (i % items)*(HASH_BYTES), (uint8_t*)(cacheCache[epoch].data()) + (((i % items)*HASH_BYTES)+HASH_BYTES), mix);
+    uint32_t *mix = new uint32_t[HASH_BYTES / sizeof(uint32_t)];
+    std::memcpy(mix, cacheCache[epoch].data() + ((i % items) * (HASH_BYTES / sizeof(uint32_t))), HASH_BYTES);
     mix[0] ^= i;
     sph_blake256_init(&ctx);
     sph_blake256(&ctx, mix, HASH_BYTES);
     sph_blake256_close(&ctx, mix);
-    for(uint64_t item = 0; item < DATASET_PARENTS; item++) {
-        uint64_t index = fnv(i ^ item, mix[item % hashwords]);
-        for(uint64_t byte = 0; byte < hashwords; byte++) {
-            mix[byte] = fnv(mix[byte], cacheCache[epoch][((index % items)*hashwords) + byte]);
+    for(uint64_t parent = 0; parent < DATASET_PARENTS; parent++) {
+        uint64_t index = fnv(i ^ parent, mix[parent % (HASH_BYTES / sizeof(uint32_t))]) % items;
+        for(uint64_t dword = 0; dword < (HASH_BYTES / sizeof(uint32_t)); dword++) {
+            mix[dword] = fnv(mix[dword], cacheCache[epoch][index * (HASH_BYTES / sizeof(uint32_t))]);
         }
     }
     sph_blake256_init(&ctx);
@@ -189,82 +196,80 @@ CDAGNode CDAGSystem::GetNode(uint64_t i, int32_t height) {
 CDAGNode CDAGSystem::GetNodeFromGraph(uint64_t i, int32_t height) {
     uint64_t epoch = height / EPOCH_LENGTH;
     PopulateGraphEpoch(epoch);
-    CDAGNode node(graphCache[epoch].data() + (i * (HASH_BYTES / WORD_BYTES)), true);
-    return node;
+    return CDAGNode(graphCache[epoch].data() + (i * (HASH_BYTES / sizeof(uint32_t))), true);
 }
 
 CHashimotoResult CDAGSystem::Hashimoto(CBlockHeader header) {
     uint64_t epoch = header.height / EPOCH_LENGTH;
     uint64_t items = GetGraphSize(epoch) / HASH_BYTES;
-    uint64_t wordhashes = MIX_BYTES / WORD_BYTES;
-    uint64_t mixhashes = MIX_BYTES / HASH_BYTES;
-    uint64_t hashwords = HASH_BYTES / WORD_BYTES;
-    uint32_t hashedheader[hashwords];
-    uint32_t mix[wordhashes];
-    uint32_t cmix[wordhashes / WORD_BYTES];
-    lyra2re2_hash((char*)&header.nVersion, (char*)hashedheader);
+    const uint64_t mixhashes = MIX_BYTES / HASH_BYTES;
+    uint32_t headerhash[HASH_BYTES / sizeof(uint32_t)];
+    uint32_t mix[MIX_BYTES / sizeof(uint32_t)];
+    uint32_t cmix[(MIX_BYTES / sizeof(uint32_t)) / sizeof(uint32_t)];
+    lyra2re2_hash((char*)&header, (char*)headerhash);
     for(uint64_t i = 0; i < mixhashes; i++) {
-        std::copy((uint8_t*)hashedheader, (uint8_t*)hashedheader + HASH_BYTES, (uint8_t*)mix + (i * HASH_BYTES));
+        std::memcpy(mix + (i * (HASH_BYTES / sizeof(uint32_t))), headerhash, HASH_BYTES);
     }
-
     for(uint64_t i = 0; i < ACCESSES; i++) {
-        uint32_t target = fnv(i ^ hashedheader[0], mix[i % wordhashes]) % (items / mixhashes) * mixhashes;
+        uint32_t target = (fnv(i ^ headerhash[0], mix[i % (MIX_BYTES / sizeof(uint32_t))]) % (items / mixhashes)) * mixhashes;
+        uint32_t mapdata[MIX_BYTES / sizeof(uint32_t)];
         for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
             CDAGNode node = GetNode(target + mixhash, header.height);
-            for(uint64_t byte = 0; byte < hashwords; byte++) {
-                mix[(mixhash * hashwords) + byte] = fnv(mix[(mixhash * hashwords) + byte], node.GetNodePtr()[byte]);
-            }
+            assert((mixhash * (HASH_BYTES / sizeof(uint32_t))) < 16);
+            std::memcpy(mapdata + (mixhash * (HASH_BYTES / sizeof(uint32_t))), node.GetNodePtr(), HASH_BYTES);
+        }
+        for(uint64_t dword = 0; dword < (MIX_BYTES / sizeof(uint32_t)); dword++) {
+            mix[dword] = fnv(mix[dword], mapdata[dword]);
+            assert(dword < sizeof(mix));
         }
     }
-
-    for(uint64_t i = 0; i < wordhashes; i += 4) {
-        cmix[i/4] = fnv(fnv(fnv(mix[i], mix[i+1]), mix[i+2]), mix[i+3]);
+    for(uint64_t i = 0; i < MIX_BYTES / sizeof(uint32_t); i += sizeof(uint32_t)) {
+        cmix[i / sizeof(uint32_t)] = fnv(fnv(fnv(mix[i], mix[i+1]), mix[i+2]), mix[i+3]);
+        assert((i/4) < sizeof(cmix));
     }
-    uint128 cmix_res;
+    uint128 resmix;
     uint256 result;
-    std::copy((uint8_t*)cmix, (uint8_t*)cmix + (MIX_BYTES / WORD_BYTES), cmix_res.begin());
-    std::array<uint8_t, HEADER_BYTES> finalhash;
-    std::copy((uint8_t*)hashedheader, (uint8_t*)hashedheader + HASH_BYTES, finalhash.begin());
-    std::copy(((uint8_t*)&header.height), ((uint8_t*)&header.height) + WORD_BYTES, finalhash.begin() + HASH_BYTES);
-    std::copy((uint8_t*)cmix, (uint8_t*)cmix + (MIX_BYTES / WORD_BYTES), finalhash.begin() + HASH_BYTES + WORD_BYTES);
-    lyra2re2_hash52((char*)finalhash.data(), (char*)result.begin());
-    return lastwork = CHashimotoResult(cmix_res, result);
+    std::memcpy(resmix.begin(), cmix, MIX_BYTES / sizeof(uint32_t));
+    std::array<uint8_t, HEADER_BYTES> fhash;
+    std::memcpy(fhash.data(), headerhash, HASH_BYTES);
+    std::memcpy(fhash.data() + HASH_BYTES, &header.height, sizeof(int32_t));
+    std::memcpy(fhash.data() + HASH_BYTES + sizeof(int32_t), cmix, MIX_BYTES / sizeof(uint32_t));
+    lyra2re2_hash52((char*)fhash.data(), (char*)result.begin());
+    return CHashimotoResult(resmix, result);
 }
 
 CHashimotoResult CDAGSystem::FastHashimoto(CBlockHeader header) {
     uint64_t epoch = header.height / EPOCH_LENGTH;
     uint64_t items = GetGraphSize(epoch) / HASH_BYTES;
-    uint64_t wordhashes = MIX_BYTES / WORD_BYTES;
-    uint64_t mixhashes = MIX_BYTES / HASH_BYTES;
-    uint64_t hashwords = HASH_BYTES / WORD_BYTES;
-    uint32_t hashedheader[hashwords];
-    uint32_t mix[wordhashes];
-    uint32_t cmix[wordhashes / WORD_BYTES];
-    lyra2re2_hash((char*)&header.nVersion, (char*)hashedheader);
+    const uint64_t mixhashes = MIX_BYTES / HASH_BYTES;
+    uint32_t headerhash[HASH_BYTES / sizeof(uint32_t)];
+    uint32_t mix[MIX_BYTES / sizeof(uint32_t)];
+    uint32_t cmix[(MIX_BYTES / sizeof(uint32_t)) / sizeof(uint32_t)];
+    lyra2re2_hash((char*)&header, (char*)headerhash);
     for(uint64_t i = 0; i < mixhashes; i++) {
-        std::copy((uint8_t*)hashedheader, (uint8_t*)hashedheader + HASH_BYTES, (uint8_t*)mix + (i * HASH_BYTES));
+        std::memcpy(mix + (i * (HASH_BYTES / sizeof(uint32_t))), headerhash, HASH_BYTES);
     }
-
     for(uint64_t i = 0; i < ACCESSES; i++) {
-        uint32_t target = fnv(i ^ hashedheader[0], mix[i % wordhashes]) % (items / mixhashes) * mixhashes;
+        uint32_t target = fnv(i ^ headerhash[0], mix[i % (MIX_BYTES / sizeof(uint32_t))]) % (items / mixhashes) * mixhashes;
+        uint32_t mapdata[MIX_BYTES / sizeof(uint32_t)];
         for(uint64_t mixhash = 0; mixhash < mixhashes; mixhash++) {
             CDAGNode node = GetNodeFromGraph(target + mixhash, header.height);
-            for(uint64_t byte = 0; byte < hashwords; byte++) {
-                mix[(mixhash * hashwords) + byte] = fnv(mix[(mixhash * hashwords) + byte], node.GetNodePtr()[byte]);
-            }
+            std::memcpy(mapdata + (mixhash * (HASH_BYTES / sizeof(uint32_t))), node.GetNodePtr(), HASH_BYTES);
+        }
+        for(uint64_t dword = 0; dword < (MIX_BYTES / sizeof(uint32_t)); dword++) {
+            mix[dword] = fnv(mix[dword], mapdata[dword]);
         }
     }
-
-    for(uint64_t i = 0; i < wordhashes; i += 4) {
-        cmix[i/4] = fnv(fnv(fnv(mix[i], mix[i+1]), mix[i+2]), mix[i+3]);
+    for(uint64_t i = 0; i < MIX_BYTES / sizeof(uint32_t); i += sizeof(uint32_t)) {
+        cmix[i / sizeof(uint32_t)] = fnv(fnv(fnv(mix[i], mix[i+1]), mix[i+2]), mix[i+3]);
     }
-    uint128 cmix_res;
+    uint128 resmix;
     uint256 result;
-    std::copy((uint8_t*)cmix, (uint8_t*)cmix + (MIX_BYTES / WORD_BYTES), cmix_res.begin());
-    std::array<uint8_t, HEADER_BYTES> finalhash;
-    std::copy((uint8_t*)hashedheader, (uint8_t*)hashedheader + HASH_BYTES, finalhash.begin());
-    std::copy(((uint8_t*)&header.height), ((uint8_t*)&header.height) + WORD_BYTES, finalhash.begin() + HASH_BYTES);
-    std::copy((uint8_t*)cmix, (uint8_t*)cmix + (MIX_BYTES / WORD_BYTES), finalhash.begin() + HASH_BYTES + WORD_BYTES);
-    lyra2re2_hash52((char*)finalhash.data(), (char*)result.begin());
-    return lastwork = CHashimotoResult(cmix_res, result);
+    std::memcpy(resmix.begin(), cmix, MIX_BYTES / sizeof(uint32_t));
+    std::array<uint8_t, HEADER_BYTES> fhash;
+    std::memcpy(fhash.data(), headerhash, HASH_BYTES);
+    std::memcpy(fhash.data() + HASH_BYTES, &header.height, sizeof(int32_t));
+    std::memcpy(fhash.data() + HASH_BYTES + sizeof(int32_t), cmix, MIX_BYTES / sizeof(uint32_t));
+    lyra2re2_hash52((char*)fhash.data(), (char*)result.begin());
+    return CHashimotoResult(resmix, result);
 }

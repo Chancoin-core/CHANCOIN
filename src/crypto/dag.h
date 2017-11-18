@@ -8,16 +8,15 @@
 class CBlockHeader;
 
 class CDAGNode {
-private:
-    uint32_t *ptr;
-    bool fGraphDerived;
 public:
     CDAGNode(uint32_t *ptr, bool fGraphDerived);
 
-    uint32_t* GetNodePtr();
+    uint32_t *GetNodePtr();
 
     ~CDAGNode();
-
+private:
+    uint32_t *ptr;
+    bool fGraphDerived;
 };
 
 class CHashimotoResult {
