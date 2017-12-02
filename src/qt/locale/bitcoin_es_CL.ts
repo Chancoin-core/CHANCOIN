@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Send coins to a Litecoin address</source>
-        <translation>Enviar monedas a una dirección litecoin</translation>
+        <translation>Enviar monedas a una dirección chancoin</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
@@ -206,8 +206,8 @@
         <translation>Barra de pestañas</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and litecoin: URIs)</source>
-        <translation>Pide pagos (genera codigos QR and litecoin: URls)</translation>
+        <source>Request payments (generates QR codes and chancoin: URIs)</source>
+        <translation>Pide pagos (genera codigos QR and chancoin: URls)</translation>
     </message>
     <message>
         <source>Error</source>
@@ -773,7 +773,7 @@
     </message>
     <message>
         <source>Litecoin Core</source>
-        <translation>litecoin core</translation>
+        <translation>chancoin core</translation>
     </message>
     <message>
         <source>Error loading block database</source>

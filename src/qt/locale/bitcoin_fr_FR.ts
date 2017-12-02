@@ -43,11 +43,11 @@
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>Choisissez une adresse où envoyer les litecoins</translation>
+        <translation>Choisissez une adresse où envoyer les chancoins</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>Choisissez une adresse où recevoir les litecoins</translation>
+        <translation>Choisissez une adresse où recevoir les chancoins</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
@@ -310,16 +310,16 @@
         <translation>Barre d'outils des onglets</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and litecoin: URIs)</source>
-        <translation>Demander des paiements (générer QR codes et litecoin: URIs)</translation>
+        <source>Request payments (generates QR codes and chancoin: URIs)</source>
+        <translation>Demander des paiements (générer QR codes et chancoin: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
         <translation>Montrer la liste des adresses d'envois utilisées et les étiquettes</translation>
     </message>
     <message>
-        <source>Open a litecoin: URI or payment request</source>
-        <translation>Ouvrir un litecoin: URI ou demande de paiement</translation>
+        <source>Open a chancoin: URI or payment request</source>
+        <translation>Ouvrir un chancoin: URI ou demande de paiement</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

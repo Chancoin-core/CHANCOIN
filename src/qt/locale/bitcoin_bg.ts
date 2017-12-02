@@ -406,7 +406,7 @@
         <translation>Раздели</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and litecoin: URIs)</source>
+        <source>Request payments (generates QR codes and chancoin: URIs)</source>
         <translation>Изискване на плащания(генерира QR кодове и Litecoin: URIs)</translation>
     </message>
     <message>
@@ -418,7 +418,7 @@
         <translation>Покажи списък с използваните адреси и имена.</translation>
     </message>
     <message>
-        <source>Open a litecoin: URI or payment request</source>
+        <source>Open a chancoin: URI or payment request</source>
         <translation>Отворете Litecoin: URI  или заявка за плащане</translation>
     </message>
     <message>
@@ -1086,7 +1086,7 @@
         <translation>Възникна грешка по време назаявката за плащане</translation>
     </message>
     <message>
-        <source>Cannot start litecoin: click-to-pay handler</source>
+        <source>Cannot start chancoin: click-to-pay handler</source>
         <translation>Litecoin не можe да се стартира: click-to-pay handler</translation>
     </message>
     <message>

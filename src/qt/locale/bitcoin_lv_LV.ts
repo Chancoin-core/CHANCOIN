@@ -39,11 +39,11 @@
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>Izvēlies adresi uz kuru sūtīt litecoins</translation>
+        <translation>Izvēlies adresi uz kuru sūtīt chancoins</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>Izvēlies adresi ar kuru saņemt litecoins</translation>
+        <translation>Izvēlies adresi ar kuru saņemt chancoins</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -278,12 +278,12 @@
         <translation>Ciļņu rīkjosla</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and litecoin: URIs)</source>
-        <translation>Pieprasīt maksājumus (izveido QR kodu un litecoin: URIs)</translation>
+        <source>Request payments (generates QR codes and chancoin: URIs)</source>
+        <translation>Pieprasīt maksājumus (izveido QR kodu un chancoin: URIs)</translation>
     </message>
     <message>
-        <source>Open a litecoin: URI or payment request</source>
-        <translation>Atvērt litecoin URI vai maksājuma pieprasījumu</translation>
+        <source>Open a chancoin: URI or payment request</source>
+        <translation>Atvērt chancoin URI vai maksājuma pieprasījumu</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -563,7 +563,7 @@
     </message>
     <message>
         <source>Enable coin &amp;control features</source>
-        <translation>Ieslēgt litecoin &amp;kontroles funkcijas</translation>
+        <translation>Ieslēgt chancoin &amp;kontroles funkcijas</translation>
     </message>
     <message>
         <source>&amp;Spend unconfirmed change</source>

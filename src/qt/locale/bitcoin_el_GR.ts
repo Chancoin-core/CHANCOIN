@@ -239,7 +239,7 @@
     </message>
     <message>
         <source>Send coins to a Litecoin address</source>
-        <translation>Στείλε νομίσματα σε μια διεύθυνση litecoin</translation>
+        <translation>Στείλε νομίσματα σε μια διεύθυνση chancoin</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
@@ -314,8 +314,8 @@
         <translation>Εργαλειοθήκη καρτελών</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and litecoin: URIs)</source>
-        <translation>Αίτηση πληρωμών (δημιουργεί QR codes και διευθύνσεις litecoin: )</translation>
+        <source>Request payments (generates QR codes and chancoin: URIs)</source>
+        <translation>Αίτηση πληρωμών (δημιουργεί QR codes και διευθύνσεις chancoin: )</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -326,8 +326,8 @@
         <translation>Προβολή της λίστας των χρησιμοποιημένων διευθύνσεων και ετικετών λήψεως</translation>
     </message>
     <message>
-        <source>Open a litecoin: URI or payment request</source>
-        <translation>Άνοιγμα litecoin: URI αίτησης πληρωμής</translation>
+        <source>Open a chancoin: URI or payment request</source>
+        <translation>Άνοιγμα chancoin: URI αίτησης πληρωμής</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

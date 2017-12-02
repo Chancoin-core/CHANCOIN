@@ -306,8 +306,8 @@
         <translation>Bara de unelte</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and litecoin: URIs)</source>
-        <translation>Cereţi plăţi (generează coduri QR şi litecoin-uri: URls)</translation>
+        <source>Request payments (generates QR codes and chancoin: URIs)</source>
+        <translation>Cereţi plăţi (generează coduri QR şi chancoin-uri: URls)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -318,8 +318,8 @@
         <translation>Arată lista de adrese pentru primire şi etichetele</translation>
     </message>
     <message>
-        <source>Open a litecoin: URI or payment request</source>
-        <translation>Deschidere litecoin: o adresa URI sau o cerere de plată</translation>
+        <source>Open a chancoin: URI or payment request</source>
+        <translation>Deschidere chancoin: o adresa URI sau o cerere de plată</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -801,7 +801,7 @@
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Alegeţi subdiviziunea folosită la afişarea interfeţei şi la trimiterea de litecoin.</translation>
+        <translation>Alegeţi subdiviziunea folosită la afişarea interfeţei şi la trimiterea de chancoin.</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -841,7 +841,7 @@
     </message>
     <message>
         <source>The supplied proxy address is invalid.</source>
-        <translation>Adresa litecoin pe care aţi specificat-o nu este validă.</translation>
+        <translation>Adresa chancoin pe care aţi specificat-o nu este validă.</translation>
     </message>
 </context>
 <context>
@@ -1473,7 +1473,7 @@
     </message>
     <message>
         <source>The Litecoin address to send the payment to</source>
-        <translation>Adresa litecoin către care se face plata</translation>
+        <translation>Adresa chancoin către care se face plata</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -1500,8 +1500,8 @@
         <translation>Introduceţi eticheta pentru ca această adresa să fie introdusă în lista de adrese folosite</translation>
     </message>
     <message>
-        <source>A message that was attached to the litecoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Litecoin network.</source>
-        <translation>un mesaj a fost ataşat la litecoin: URI care va fi stocat cu tranzacţia pentru referinţa dvs. Notă: Acest mesaj nu va fi trimis către reţeaua litecoin.</translation>
+        <source>A message that was attached to the chancoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Litecoin network.</source>
+        <translation>un mesaj a fost ataşat la chancoin: URI care va fi stocat cu tranzacţia pentru referinţa dvs. Notă: Acest mesaj nu va fi trimis către reţeaua chancoin.</translation>
     </message>
     <message>
         <source>Pay To:</source>

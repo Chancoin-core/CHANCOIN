@@ -131,7 +131,7 @@
     </message>
     <message>
         <source>Send coins to a Litecoin address</source>
-        <translation>Пошаљите новац на litecoin адресу</translation>
+        <translation>Пошаљите новац на chancoin адресу</translation>
     </message>
     <message>
         <source>Change the passphrase used for wallet encryption</source>
