@@ -130,7 +130,7 @@
         <translation>Промени &amp;лозинку...</translation>
     </message>
     <message>
-        <source>Send coins to a Litecoin address</source>
+        <source>Send coins to a Chancoin address</source>
         <translation>Пошаљите новац на chancoin адресу</translation>
     </message>
     <message>

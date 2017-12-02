@@ -38,9 +38,9 @@ def check_json_precision():
 def determine_db_dir():
     """Return the default location of the chancoin data directory"""
     if platform.system() == "Darwin":
-        return os.path.expanduser("~/Library/Application Support/Litecoin/")
+        return os.path.expanduser("~/Library/Application Support/Chancoin/")
     elif platform.system() == "Windows":
-        return os.path.join(os.environ['APPDATA'], "Litecoin")
+        return os.path.join(os.environ['APPDATA'], "Chancoin")
     return os.path.expanduser("~/.chancoin")
 
 def read_bitcoin_config(dbdir):

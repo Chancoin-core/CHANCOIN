@@ -16,8 +16,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Litecoin"
-            VALUE "FileDescription",    "chancoin-tx (CLI Litecoin transaction editor utility)"
+            VALUE "CompanyName",        "Chancoin"
+            VALUE "FileDescription",    "chancoin-tx (CLI Chancoin transaction editor utility)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "chancoin-tx"
             VALUE "LegalCopyright",     COPYRIGHT_STR

@@ -29,16 +29,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>Litecoin-Qt</string>
+  <string>Chancoin-Qt</string>
   
   <key>CFBundleName</key>
-  <string>Litecoin-Qt</string>
+  <string>Chancoin-Qt</string>
 
   <key>LSHasLocalizedDisplayName</key>
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>org.chancoin.Litecoin-Qt</string>
+  <string>org.chancoin.Chancoin-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -46,7 +46,7 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>org.chancoin.LitecoinPayment</string>
+      <string>org.chancoin.ChancoinPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>chancoin</string>
@@ -60,7 +60,7 @@
       <key>UTTypeIdentifier</key>
       <string>org.chancoin.paymentrequest</string>
       <key>UTTypeDescription</key>
-      <string>Litecoin payment request</string>
+      <string>Chancoin payment request</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
