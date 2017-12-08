@@ -1,6 +1,7 @@
 #ifndef DAG_H
 #define DAG_H
 
+#include <array>
 #include <map>
 #include <vector>
 #include "uint256.h"
