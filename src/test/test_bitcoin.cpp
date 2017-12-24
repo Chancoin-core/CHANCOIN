@@ -137,7 +137,7 @@ TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>&
     unsigned int extraNonce = 0;
     IncrementExtraNonce(&block, chainActive.Tip(), extraNonce);
 
-    while (!CheckProofOfWork(block.GetBlockHeader(), chainparams.GetConsensus())) ++block.nNonce;
+    while (!CheckProofOfWork(block.GetBlockHeader(), chainparams.GetConsensus(), true, true)) ++block.nNonce;
 
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(block);
     ProcessNewBlock(chainparams, shared_pblock, true, nullptr);
