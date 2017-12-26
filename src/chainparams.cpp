@@ -121,7 +121,6 @@ public:
         nPruneAfterHeight = 100000;
 
         genesis = CreateGenesisBlock(1498389310, 1146327, 0x1e0ffff0, 1, 50 * COIN);
-	std::cout << genesis.ToString() << std::endl;
         consensus.hashGenesisBlock = genesis.GetHash();
         assert(consensus.hashGenesisBlock == uint256S("0x72c18e80787d961e92bc4bd508dbe7d7c5189794d449a6a58853f4e032b4831c"));
         assert(genesis.hashMerkleRoot == uint256S("0x46b8572aab529bb7297c73009bd21073a5366380fbf1c0a2053fe05f77ea3ecb"));
