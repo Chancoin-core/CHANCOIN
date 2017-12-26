@@ -16,14 +16,14 @@
 
 #include <boost/test/unit_test.hpp>
 
-static const std::string strSecret1     ("6uGFQ4DSW7zh1viHZi6iiVT17CncvoaV4MHvGvJKPDaLCdymj87");
-static const std::string strSecret2     ("6vVo7sPkeLTwVdAntrv4Gbnsyr75H8ChD3P5iyHziwaqe8mCYR5");
-static const std::string strSecret1C    ("T3gJYmBuZXsdd65E7NQF88ZmUP2MaUanqnZg9GFS94W7kND4Ebjq");
-static const std::string strSecret2C    ("T986ZKRRdnuuXLeDZuKBRrZW1ujotAncU9WTrFU1n7vMgRW75ZtF");
-static const CBitcoinAddress addr1 ("LiUo6Zn39joYJBzPUhssbDwAywhjFcoHE3");
-static const CBitcoinAddress addr2 ("LZJvLSP5SGKcFS13MHgdrVhpFUbEMB5XVC");
-static const CBitcoinAddress addr1C("Lh2G82Bi33RNuzz4UfSMZbh54jnWHVnmw8");
-static const CBitcoinAddress addr2C("LWegHWHB5rmaF5rgWYt1YN3StapRdnGJfU");
+static const std::string strSecret1     ("5JMe46kdN9JoUBtooK9ZiPV5LDLPauGaYabVBTWW77k4v5Dpgy6");
+static const std::string strSecret2     ("5JivTUB7PmLAjzKXvd3AuXCfq38cerqQPSiV9UKNmnwVNSD4LS3");
+static const std::string strSecret1C    ("L2iVufGnYe4Bb6sHRLfqBkJP2CiJiZcnucYbq4q6PTSLQa3nV9pV");
+static const std::string strSecret2C    ("KyavqCVV1mMXBUwD5qnm1TeSpCrtUJURqYriudFofySSaijcJPCS");
+static const CBitcoinAddress addr1 ("CUPXBGHiLrBCBbrW2sLcHiD5Y7Ey2AQuZX");
+static const CBitcoinAddress addr2 ("CTVEWpAybXeXCvQFs8CUNSXGGKYSUtWZyp");
+static const CBitcoinAddress addr1C("CXfUsLEXUFUJNGDx37F2V3hSQMM99QxtN9");
+static const CBitcoinAddress addr2C("CREU2V8TpnBLx8DXY7NxHAsy6nXLYLD4XG");
 
 
 static const std::string strAddressBad("Lbi6bpMhSwp2CXkivEeUK9wzyQEFzHDfSr");
