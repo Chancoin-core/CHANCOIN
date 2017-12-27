@@ -208,8 +208,9 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0xfd7e409a273c81abdcb5249eb42c590d2d2f0618f24fef2b56e2570734459cca"));
         assert(genesis.hashMerkleRoot == uint256S("0x46b8572aab529bb7297c73009bd21073a5366380fbf1c0a2053fe05f77ea3ecb"));
 
-        vFixedSeeds.clear();
-        vSeeds.clear();
+        vSeeds.emplace_back("node.chancoin.moe", true);
+        vSeeds.emplace_back("node2.chancoin.moe", true);
+        vSeeds.emplace_back("node3.chancoin.moe", true);
         // nodes with support for servicebits filtering should be at the top
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
