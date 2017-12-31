@@ -134,6 +134,7 @@ void CDAGSystem::CreateCacheInPlace(uint64_t epoch) {
             std::memcpy(cacheCache[epoch].data() + (i * (HASH_BYTES / sizeof(uint32_t))), item, HASH_BYTES);
         }
     }
+
 }
 
 void CDAGSystem::CreateGraphInPlace(uint64_t epoch) {

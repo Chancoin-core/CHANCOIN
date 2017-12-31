@@ -2909,6 +2909,9 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     assert(pindexPrev != nullptr);
     const int nHeight = pindexPrev->nHeight + 1;
 
+    if((block.nVersion & 0x00000100) && (block.height != nHeight))
+        return state.DoS(100, false, REJECT_INVALID, "bad-headerheight", false, "incorrect cloverhash height");
+
     // Check proof of work
     const Consensus::Params& consensusParams = params.GetConsensus();
     if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
