@@ -100,6 +100,10 @@ UniValue blockheaderToJSON(const CBlockIndex* blockindex)
     CBlockIndex *pnext = chainActive.Next(blockindex);
     if (pnext)
         result.push_back(Pair("nextblockhash", pnext->GetBlockHash().GetHex()));
+    if (blockindex->nVersion & 0x00000100) {
+        result.push_back(Pair("mixhash", blockindex->hashMix.GetHex()));
+        result.push_back(Pair("clheight", blockindex->height));
+    }
     return result;
 }
 
@@ -144,6 +148,12 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     CBlockIndex *pnext = chainActive.Next(blockindex);
     if (pnext)
         result.push_back(Pair("nextblockhash", pnext->GetBlockHash().GetHex()));
+
+    if (block.nVersion & 0x00000100) {
+        result.push_back(Pair("mixhash", blockindex->hashMix.GetHex()));
+        result.push_back(Pair("clheight", blockindex->height));
+    }
+
     return result;
 }
 
@@ -652,6 +662,8 @@ UniValue getblockheader(const JSONRPCRequest& request)
             "  \"chainwork\" : \"0000...1f3\"     (string) Expected number of hashes required to produce the current chain (in hex)\n"
             "  \"previousblockhash\" : \"hash\",  (string) The hash of the previous block\n"
             "  \"nextblockhash\" : \"hash\",      (string) The hash of the next block\n"
+            "  \"mixhash\" : \"hash\",            (string) The hash of the mix state\n"
+            "  \"clheight\" : n,        (numeric) The header height\n"
             "}\n"
             "\nResult (for verbose=false):\n"
             "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash'.\n"
@@ -721,6 +733,8 @@ UniValue getblock(const JSONRPCRequest& request)
             "  \"chainwork\" : \"xxxx\",  (string) Expected number of hashes required to produce the chain up to this block (in hex)\n"
             "  \"previousblockhash\" : \"hash\",  (string) The hash of the previous block\n"
             "  \"nextblockhash\" : \"hash\"       (string) The hash of the next block\n"
+            "  \"mixhash\" : \"hash\",            (string) The hash of the mix state\n"
+            "  \"clheight\" : n,        (numeric) The header height\n"
             "}\n"
             "\nResult (for verbosity = 2):\n"
             "{\n"
