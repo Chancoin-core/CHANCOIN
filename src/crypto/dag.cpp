@@ -153,6 +153,11 @@ void CDAGSystem::PopulateCacheEpoch(uint64_t epoch) {
     static CCriticalSection cs;
     {
         LOCK(cs);
+        if(epoch > 1) {
+            if(cacheCache[epoch - 2].size() > 0) {
+                cacheCache[epoch - 2] = std::vector<uint32_t>();
+            }
+        }
         PopulateSeedEpoch(epoch);
         CreateCacheInPlace(epoch);
     }
