@@ -131,13 +131,14 @@ public:
         vSeeds.emplace_back("edgar.chancoin.moe", true);
         vSeeds.emplace_back("name.chancoin.moe", true);
         vSeeds.emplace_back("gossamer.chancoin.moe", true);
+        vSeeds.emplace_back("chancoin.info", true);
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,28);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,54);
+        base58Prefixes[PUBKEY_ADDRESS]  = std::vector<unsigned char>(1,28);
+        base58Prefixes[SCRIPT_ADDRESS]  = std::vector<unsigned char>(1,54);
         base58Prefixes[SCRIPT_ADDRESS2] = std::vector<unsigned char>(1,50);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,176);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
+        base58Prefixes[SECRET_KEY]      = std::vector<unsigned char>(1,176);
+        base58Prefixes[EXT_PUBLIC_KEY]  = {0x04, 0x88, 0xB2, 0x1E};
+        base58Prefixes[EXT_SECRET_KEY]  = {0x04, 0x88, 0xAD, 0xE4};
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
@@ -148,9 +149,9 @@ public:
         checkpointData = (CCheckpointData) {
             {
                 { 1000, uint256S("0xe4107d00d145cdf5cd126511eb884c21dfe2cf217d7e421ec44f631663e12128")},
-		{ 6000, uint256S("0x5aa6f651f44931f90daa9b7daa0aa3199f526f0c8d6aa732b97ab92c489135e8")},
-		{ 12000, uint256S("0xb80c2b0a7d6882902330672e51ed3fcdb044548a3f080cf94a4eaf49ec3a462d")},
-		{ 17000, uint256S("0xb8ffcd51dcdb11f640dc38d67b8fe2183e68bc3fcd0d064f000e059c7612ccf3")}
+                { 6000, uint256S("0x5aa6f651f44931f90daa9b7daa0aa3199f526f0c8d6aa732b97ab92c489135e8")},
+                { 12000, uint256S("0xb80c2b0a7d6882902330672e51ed3fcdb044548a3f080cf94a4eaf49ec3a462d")},
+                { 17000, uint256S("0xb8ffcd51dcdb11f640dc38d67b8fe2183e68bc3fcd0d064f000e059c7612ccf3")}
             }
         };
 	//I'm not sure how generate correct data for this here.
