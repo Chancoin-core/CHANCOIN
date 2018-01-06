@@ -54,10 +54,10 @@ bool IsDust(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
     return (txout.nValue < GetDustThreshold(txout, dustRelayFeeIn));
 }
 
-    /**
+/**
      * Check transaction inputs to mitigate two
      * potential denial-of-service attacks:
-     * 
+     *
      * 1. scriptSigs with extra data stuffed into them,
      *    not consumed by scriptPubKey (or P2SH script)
      * 2. P2SH scripts with a crazy number of expensive
@@ -88,7 +88,7 @@ bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType, const bool w
             return false;
     } else if (whichType == TX_NULL_DATA &&
                (!fAcceptDatacarrier || scriptPubKey.size() > nMaxDatacarrierBytes))
-          return false;
+        return false;
 
     else if (!witnessEnabled && (whichType == TX_WITNESS_V0_KEYHASH || whichType == TX_WITNESS_V0_SCRIPTHASH))
         return false;
@@ -122,6 +122,20 @@ bool IsStandardTx(const CTransaction& tx, std::string& reason, const bool witnes
         // future-proofing. That's also enough to spend a 20-of-20
         // CHECKMULTISIG scriptPubKey, though such a scriptPubKey is not
         // considered standard.
+        if (
+                (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 0) || // 853737.95200000 CHAN burned
+                (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 1) || // 223982.00000000 CHAN burned
+                (txin.prevout.hash == uint256S("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && txin.prevout.n == 1) || // 198223.00000000 CHAN burned
+                (txin.prevout.hash == uint256S("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && txin.prevout.n == 1) || // 200000.00000000 CHAN burned
+                (txin.prevout.hash == uint256S("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && txin.prevout.n == 0) || // 100000.00000000 CHAN burned
+                (txin.prevout.hash == uint256S("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && txin.prevout.n == 1) || // 100000.00000000 CHAN burned
+                (txin.prevout.hash == uint256S("3a4c828cbf4413c25333dd705f9be5f9e245e746496eee2b697e4acebe3091f2") && txin.prevout.n == 0) || // 276907.82489380 CHAN burned
+                (txin.prevout.hash == uint256S("a50f178673431d12435734d104c8c5772b32eac3adc7d9b49e9664765ce22458") && txin.prevout.n == 2) || // 99732.43636414 CHAN burned
+                (txin.prevout.hash == uint256S("f8cb03e0238d5c307c87624f23c5fcef1793391a03dd936069fb0943ee8ad03a") && txin.prevout.n == 1) || // 99719.88346663 CHAN burned
+                (txin.prevout.hash == uint256S("982c8f54afab90b5163a7c7e845c05309427ea020a78afc635fe168e9759e9d5") && txin.prevout.n == 1)) { // 99999.00000000 CHAN burned
+            LogPrintf("ERROR: IsStandard: burnt coins from txid %s cannot be spent\n", txin.prevout.ToString().c_str());
+            return false;
+        }
         if (txin.scriptSig.size() > 1650) {
             reason = "scriptsig-size";
             return false;
@@ -168,7 +182,20 @@ bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
     for (unsigned int i = 0; i < tx.vin.size(); i++)
     {
         const CTxOut& prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;
-
+        if (
+                (tx.vin[i].prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && tx.vin[i].prevout.n == 0) || // 853737.95200000 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && tx.vin[i].prevout.n == 1) || // 223982.00000000 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && tx.vin[i].prevout.n == 1) || // 198223.00000000 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && tx.vin[i].prevout.n == 1) || // 200000.00000000 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && tx.vin[i].prevout.n == 0) || // 100000.00000000 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && tx.vin[i].prevout.n == 1) || // 100000.00000000 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("3a4c828cbf4413c25333dd705f9be5f9e245e746496eee2b697e4acebe3091f2") && tx.vin[i].prevout.n == 0) || // 276907.82489380 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("a50f178673431d12435734d104c8c5772b32eac3adc7d9b49e9664765ce22458") && tx.vin[i].prevout.n == 2) || // 99732.43636414 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("f8cb03e0238d5c307c87624f23c5fcef1793391a03dd936069fb0943ee8ad03a") && tx.vin[i].prevout.n == 1) || // 99719.88346663 CHAN burned
+                (tx.vin[i].prevout.hash == uint256S("982c8f54afab90b5163a7c7e845c05309427ea020a78afc635fe168e9759e9d5") && tx.vin[i].prevout.n == 1)) { // 99999.00000000 CHAN burned
+            LogPrintf("ERROR: AreInputsStandard : burnt coins from txid %s cannot be spent\n", tx.vin[i].prevout.ToString().c_str());
+            return false;
+        }
         std::vector<std::vector<unsigned char> > vSolutions;
         txnouttype whichType;
         // get the scriptPubKey corresponding to this input:

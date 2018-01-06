@@ -76,37 +76,38 @@ public:
         strNetworkID = "main";
         consensus.nSubsidyHalvingInterval = 210000;
         consensus.BIP34Height = 1;
-        //consensus.BIP34Hash = uint256S("fa09d204a83a768ed5a7c8d441fa62f2043abf420cff1226c7b4329aeb9d51cf");
-        consensus.BIP65Height = INT32_MAX; // bab3041e8977e0dc3eeff63fe707b92bde1dd449d8efafb248c27c8264cc311a
-        consensus.BIP66Height = INT32_MAX; // 7aceee012833fa8952f8835d8b1b3ae233cd6ab08fdb27a771d2bd7bdc491894
-        consensus.CloverhashHeight = INT32_MAX;
+        consensus.BIP34Hash = uint256S("0x4c18ba4bb85dd868d1adca7bd36e402d452c1d8c83ca78ab37f7abda3eac60a6");
+        consensus.BIP65Height = 30000; // Err, it'll happen at some point
+        consensus.BIP66Height = 30000; // Same with this.
+        consensus.CloverhashHeight = 30000;
         consensus.powLimit = uint256S("0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 10*60; // 3.5 days
         consensus.nPowTargetSpacing = 5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
-        consensus.nRuleChangeActivationThreshold = 6048; // 75% of 8064
-        consensus.nMinerConfirmationWindow = 8064; // nPowTargetTimespan / nPowTargetSpacing * 4
-    /*
+        consensus.nRuleChangeActivationThreshold = 1512; // 75% of 2016
+        consensus.nMinerConfirmationWindow = 2016; // Kind of arbitrary, due to fucked up difficulty changes.
+
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
         // Deployment of BIP68, BIP112, and BIP113.
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1485561600; // January 28, 2017
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1517356801; // January 31st, 2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1518566400; // ❤
+        //If this displays as an emoji on your computer, just remember it isn't intended to be one.
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1526774400; // A very special date.
 
         // Deployment of SegWit (BIP141, BIP143, and BIP147)
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1485561600; // January 28, 2017
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1517356801; // January 31st, 2018
-	*/
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1518566400; // ❤
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1526774400; // May 20th, 2018.
+
         // The best chain should have at least this much work.
-        //consensus.nMinimumChainWork = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.nMinimumChainWork = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        //consensus.defaultAssumeValid = uint256S("0x72c18e80787d961e92bc4bd508dbe7d7c5189794d449a6a58853f4e032b4831c"); //1259849
+        consensus.defaultAssumeValid = uint256S("0xe4107d00d145cdf5cd126511eb884c21dfe2cf217d7e421ec44f631663e12128"); // 1000
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -146,8 +147,13 @@ public:
 
         checkpointData = (CCheckpointData) {
             {
+                { 1000, uint256S("0xe4107d00d145cdf5cd126511eb884c21dfe2cf217d7e421ec44f631663e12128")},
+		{ 6000, uint256S("0x5aa6f651f44931f90daa9b7daa0aa3199f526f0c8d6aa732b97ab92c489135e8")},
+		{ 12000, uint256S("0xb80c2b0a7d6882902330672e51ed3fcdb044548a3f080cf94a4eaf49ec3a462d")},
+		{ 17000, uint256S("0xb8ffcd51dcdb11f640dc38d67b8fe2183e68bc3fcd0d064f000e059c7612ccf3")}
             }
         };
+	//I'm not sure how generate correct data for this here.
 	/*
         chainTxData = ChainTxData{
             // Data as of block db42d00d824950a125f9b08b6b6c282c484781562fa8b3bd29d6ce4a2627c348 (height 1259851).

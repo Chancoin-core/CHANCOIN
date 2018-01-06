@@ -13,7 +13,7 @@
 #include "chain.h"
 #include "coins.h"
 #include "utilmoneystr.h"
- 
+
 bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime)
 {
     if (tx.nLockTime == 0)
@@ -43,7 +43,7 @@ std::pair<int, int64_t> CalculateSequenceLocks(const CTransaction &tx, int flags
     // we would be doing a signed comparison and half the range of nVersion
     // wouldn't support BIP 68.
     bool fEnforceBIP68 = static_cast<uint32_t>(tx.nVersion) >= 2
-                      && flags & LOCKTIME_VERIFY_SEQUENCE;
+            && flags & LOCKTIME_VERIFY_SEQUENCE;
 
     // Do not enforce sequence numbers as a relative lock time
     // unless we have been instructed to
@@ -197,9 +197,23 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     }
     else
     {
-        for (const auto& txin : tx.vin)
+        for (const auto& txin : tx.vin) {
+            if (
+                    (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 0) || // 853737.95200000 CHAN burned
+                    (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 1) || // 223982.00000000 CHAN burned
+                    (txin.prevout.hash == uint256S("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && txin.prevout.n == 1) || // 198223.00000000 CHAN burned
+                    (txin.prevout.hash == uint256S("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && txin.prevout.n == 1) || // 200000.00000000 CHAN burned
+                    (txin.prevout.hash == uint256S("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && txin.prevout.n == 0) || // 100000.00000000 CHAN burned
+                    (txin.prevout.hash == uint256S("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && txin.prevout.n == 1) || // 100000.00000000 CHAN burned
+                    (txin.prevout.hash == uint256S("3a4c828cbf4413c25333dd705f9be5f9e245e746496eee2b697e4acebe3091f2") && txin.prevout.n == 0) || // 276907.82489380 CHAN burned
+                    (txin.prevout.hash == uint256S("a50f178673431d12435734d104c8c5772b32eac3adc7d9b49e9664765ce22458") && txin.prevout.n == 2) || // 99732.43636414 CHAN burned
+                    (txin.prevout.hash == uint256S("f8cb03e0238d5c307c87624f23c5fcef1793391a03dd936069fb0943ee8ad03a") && txin.prevout.n == 1) || // 99719.88346663 CHAN burned
+                    (txin.prevout.hash == uint256S("982c8f54afab90b5163a7c7e845c05309427ea020a78afc635fe168e9759e9d5") && txin.prevout.n == 1)) { // 99999.00000000 CHAN burned
+                return state.DoS(100, false, REJECT_INVALID, "CTransaction::CheckTransaction() : burnt coins unspendable");
+            }
             if (txin.prevout.IsNull())
                 return state.DoS(10, false, REJECT_INVALID, "bad-txns-prevout-null");
+        }
     }
 
     return true;
@@ -207,44 +221,44 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
 
 bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, int nSpendHeight)
 {
-        // This doesn't trigger the DoS code on purpose; if it did, it would make it easier
-        // for an attacker to attempt to split the network.
-        if (!inputs.HaveInputs(tx))
-            return state.Invalid(false, 0, "", "Inputs unavailable");
+    // This doesn't trigger the DoS code on purpose; if it did, it would make it easier
+    // for an attacker to attempt to split the network.
+    if (!inputs.HaveInputs(tx))
+        return state.Invalid(false, 0, "", "Inputs unavailable");
 
-        CAmount nValueIn = 0;
-        CAmount nFees = 0;
-        for (unsigned int i = 0; i < tx.vin.size(); i++)
-        {
-            const COutPoint &prevout = tx.vin[i].prevout;
-            const Coin& coin = inputs.AccessCoin(prevout);
-            assert(!coin.IsSpent());
+    CAmount nValueIn = 0;
+    CAmount nFees = 0;
+    for (unsigned int i = 0; i < tx.vin.size(); i++)
+    {
+        const COutPoint &prevout = tx.vin[i].prevout;
+        const Coin& coin = inputs.AccessCoin(prevout);
+        assert(!coin.IsSpent());
 
-            // If prev is coinbase, check that it's matured
-            if (coin.IsCoinBase()) {
-                if (nSpendHeight - coin.nHeight < COINBASE_MATURITY)
-                    return state.Invalid(false,
-                        REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
-                        strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
-            }
-
-            // Check for negative or overflow input values
-            nValueIn += coin.out.nValue;
-            if (!MoneyRange(coin.out.nValue) || !MoneyRange(nValueIn))
-                return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputvalues-outofrange");
-
+        // If prev is coinbase, check that it's matured
+        if (coin.IsCoinBase()) {
+            if (nSpendHeight - coin.nHeight < COINBASE_MATURITY)
+                return state.Invalid(false,
+                                     REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
+                                     strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
         }
 
-        if (nValueIn < tx.GetValueOut())
-            return state.DoS(100, false, REJECT_INVALID, "bad-txns-in-belowout", false,
-                strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(tx.GetValueOut())));
+        // Check for negative or overflow input values
+        nValueIn += coin.out.nValue;
+        if (!MoneyRange(coin.out.nValue) || !MoneyRange(nValueIn))
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputvalues-outofrange");
 
-        // Tally transaction fees
-        CAmount nTxFee = nValueIn - tx.GetValueOut();
-        if (nTxFee < 0)
-            return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-negative");
-        nFees += nTxFee;
-        if (!MoneyRange(nFees))
-            return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-outofrange");
+    }
+
+    if (nValueIn < tx.GetValueOut())
+        return state.DoS(100, false, REJECT_INVALID, "bad-txns-in-belowout", false,
+                         strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(tx.GetValueOut())));
+
+    // Tally transaction fees
+    CAmount nTxFee = nValueIn - tx.GetValueOut();
+    if (nTxFee < 0)
+        return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-negative");
+    nFees += nTxFee;
+    if (!MoneyRange(nFees))
+        return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-outofrange");
     return true;
 }

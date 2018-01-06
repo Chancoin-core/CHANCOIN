@@ -1384,10 +1384,10 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         AddTimeData(pfrom->addr, nTimeOffset);
 
         // If the peer is old enough to have the old alert system, send it the final alert.
-        /*if (pfrom->nVersion <= 70012) {
-            CDataStream finalAlert(ParseHex("5c0100000015f7675900000000ffffff7f00000000ffffff7ffeffff7f0000000000ffffff7f00ffffff7f002f555247454e543a20416c657274206b657920636f6d70726f6d697365642c2075706772616465207265717569726564004630440220405f7e7572b176f3316d4e12deab75ad4ff978844f7a7bcd5ed06f6aa094eb6602207880fcc07d0a78e0f46f188d115e04ed4ad48980ea3572cb0e0cb97921048095"), SER_NETWORK, PROTOCOL_VERSION);
+        if (pfrom->nVersion <= 70012) {
+            CDataStream finalAlert(ParseHex("5c010000000e35e15b000000000e35e15b000000001804000001000000000000000000e9a435008813000000fd01016375746520616e696d6520666f786769726c7320616e642067726561742070726f6669747320617761697420696620796f75207570677261646520746f206368616e636f696e20302e3135202d206e616d6520287769746820e29da429200a206368616e636f696e207265706f3a2068747470733a2f2f6769746875622e636f6d2f6368616e636f696e2d636f72652f6368616e636f696e200a206375746520666f78206c6f6c693a2068747470733a2f2f6d656469612e646973636f72646170702e6e65742f6174746163686d656e74732f38323737313435363437393436313337362f3339383132353631363032363631353830392f696d6167652e706e6700"), SER_NETWORK, PROTOCOL_VERSION);
             connman.PushMessage(pfrom, CNetMsgMaker(nSendVersion).Make("alert", finalAlert));
-        }*/
+        }
         //Reimplement this, resigned with Chancoin alert key
 
         // Feeler connections exist only to verify if address is online.
@@ -2291,15 +2291,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         }
 
         uint256 hashLastBlock;
-        for (const CBlockHeader& header : headers) {
-            std::cout << "Header of clblock: " << std::endl
-                      << "Version: " << header.nVersion << std::endl
-                      << "Merkle root: " << header.hashMerkleRoot.ToString() << std::endl
-                      << "Prevhash: " << header.hashPrevBlock.ToString() << std::endl
-                      << "Ntime: " << header.nTime << std::endl
-                      << "Nonce: " << header.nNonce << std::endl
-                      << "Mixhash: " << header.hashMix.ToString() << std::endl
-                      << "clheight: " << header.height << std::endl;
+        for (const CBlockHeader& header : headers) { 
             if (!hashLastBlock.IsNull() && header.hashPrevBlock != hashLastBlock) {
                 Misbehaving(pfrom->GetId(), 20);
                 return error("non-continuous headers sequence");
