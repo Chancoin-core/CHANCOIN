@@ -81,7 +81,7 @@ public:
         consensus.BIP66Height = 30000; // Same with this.
         consensus.CloverhashHeight = 30000;
         consensus.powLimit = uint256S("0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 10*60; // 3.5 days
+        consensus.nPowTargetTimespan = 10*60; // 10 minutes.
         consensus.nPowTargetSpacing = 5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
@@ -104,7 +104,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1526774400; // May 20th, 2018.
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.nMinimumChainWork = uint256S("0x0");
 
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0xe4107d00d145cdf5cd126511eb884c21dfe2cf217d7e421ec44f631663e12128"); // 1000
