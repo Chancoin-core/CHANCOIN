@@ -1032,6 +1032,11 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
     CAmount nSubsidy = 50 * COIN;
     // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
     nSubsidy >>= halvings;
+
+    if(nHeight == 1){
+       nSubsidy = 9000000 * COIN;
+    }
+
     return nSubsidy;
 }
 
@@ -1544,11 +1549,22 @@ void ThreadScriptCheck() {
 // Protected by cs_main
 VersionBitsCache versionbitscache;
 
-
 int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Params& params)
 {
     LOCK(cs_main);
     int32_t nVersion = VERSIONBITS_TOP_BITS;
+    if (GetTime() < 1518566400) {
+        if(pindexPrev->nHeight+1 >= params.CloverhashHeight)
+            return 512;
+        else if(pindexPrev->nHeight+1 >= params.BIP66Height)
+            return 4;
+        else if(pindexPrev->nHeight+1 >= params.BIP65Height)
+            return 3;
+        else if(pindexPrev->nHeight+1 >= params.BIP34Height)
+            return 2;
+        else
+            return 1;
+    }
 
     for (int i = 0; i < (int)Consensus::MAX_VERSION_BITS_DEPLOYMENTS; i++) {
         ThresholdState state = VersionBitsState(pindexPrev, params, (Consensus::DeploymentPos)i, versionbitscache);
@@ -1556,6 +1572,7 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
             nVersion |= VersionBitsMask(params, (Consensus::DeploymentPos)i);
         }
     }
+
     return nVersion;
 }
 
