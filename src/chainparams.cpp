@@ -80,8 +80,8 @@ public:
         consensus.BIP65Height = 30000; // Err, it'll happen at some point
         consensus.BIP66Height = 30000; // Same with this.
         consensus.CloverhashHeight = 30000;
-        consensus.powLimit = uint256S("0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 10*60; // 10 minutes.
+        consensus.powLimit = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.nPowTargetTimespan = 10 * 60;
         consensus.nPowTargetSpacing = 5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
@@ -107,7 +107,7 @@ public:
         consensus.nMinimumChainWork = uint256S("0x0");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0xe4107d00d145cdf5cd126511eb884c21dfe2cf217d7e421ec44f631663e12128"); // 1000
+        consensus.defaultAssumeValid = uint256S("0xc5aa36a83b4cd8829e98570d21180ab7a7f4ab039c40e9da94def27dd95a43af"); // 22000
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -148,10 +148,8 @@ public:
 
         checkpointData = (CCheckpointData) {
             {
-                { 1000, uint256S("0xe4107d00d145cdf5cd126511eb884c21dfe2cf217d7e421ec44f631663e12128")},
-                { 6000, uint256S("0x5aa6f651f44931f90daa9b7daa0aa3199f526f0c8d6aa732b97ab92c489135e8")},
-                { 12000, uint256S("0xb80c2b0a7d6882902330672e51ed3fcdb044548a3f080cf94a4eaf49ec3a462d")},
-                { 17000, uint256S("0xb8ffcd51dcdb11f640dc38d67b8fe2183e68bc3fcd0d064f000e059c7612ccf3")}
+                { 0,     uint256S("0x72c18e80787d961e92bc4bd508dbe7d7c5189794d449a6a58853f4e032b4831c")},
+                { 22000, uint256S("0xc5aa36a83b4cd8829e98570d21180ab7a7f4ab039c40e9da94def27dd95a43af")},
             }
         };
 	//I'm not sure how generate correct data for this here.

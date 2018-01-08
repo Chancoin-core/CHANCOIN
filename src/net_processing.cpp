@@ -440,7 +440,7 @@ void MaybeSetPeerAsAnnouncingHeaderAndIDs(NodeId nodeid, CConnman& connman) {
 // Requires cs_main
 bool CanDirectFetch(const Consensus::Params &consensusParams)
 {
-    return chainActive.Tip()->GetBlockTime() > GetAdjustedTime() - consensusParams.nPowTargetSpacing * 20;
+    return chainActive.Tip()->GetBlockTime() > GetAdjustedTime() - (30 * 24 * 60);
 }
 
 // Requires cs_main
@@ -1382,13 +1382,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         int64_t nTimeOffset = nTime - GetTime();
         pfrom->nTimeOffset = nTimeOffset;
         AddTimeData(pfrom->addr, nTimeOffset);
-
-        // If the peer is old enough to have the old alert system, send it the final alert.
-        if (pfrom->nVersion <= 70012) {
-            CDataStream finalAlert(ParseHex("5c010000000e35e15b000000000e35e15b000000001804000001000000000000000000e9a435008813000000fd01016375746520616e696d6520666f786769726c7320616e642067726561742070726f6669747320617761697420696620796f75207570677261646520746f206368616e636f696e20302e3135202d206e616d6520287769746820e29da429200a206368616e636f696e207265706f3a2068747470733a2f2f6769746875622e636f6d2f6368616e636f696e2d636f72652f6368616e636f696e200a206375746520666f78206c6f6c693a2068747470733a2f2f6d656469612e646973636f72646170702e6e65742f6174746163686d656e74732f38323737313435363437393436313337362f3339383132353631363032363631353830392f696d6167652e706e6700"), SER_NETWORK, PROTOCOL_VERSION);
-            connman.PushMessage(pfrom, CNetMsgMaker(nSendVersion).Make("alert", finalAlert));
-        }
-        //Reimplement this, resigned with Chancoin alert key
 
         // Feeler connections exist only to verify if address is online.
         if (pfrom->fFeeler) {
