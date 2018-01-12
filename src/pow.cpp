@@ -16,7 +16,7 @@ unsigned int DUAL_KGW3(const CBlockIndex* pindexLast, const CBlockHeader *pblock
 
     const CBlockIndex *BlockLastSolved = pindexLast;
     const CBlockIndex *BlockReading = pindexLast;
-    int64_t PastBlocksMass = 0;
+    uint64_t PastBlocksMass = 0;
     int64_t PastRateActualSeconds = 0;
     int64_t PastRateTargetSeconds = 0;
     double PastRateAdjustmentRatio = double(1);
@@ -27,19 +27,17 @@ unsigned int DUAL_KGW3(const CBlockIndex* pindexLast, const CBlockHeader *pblock
     double EventHorizonDeviationSlow;
 	
     //DUAL_KGW3 SETUP
-    const int64_t Blocktime = params.nPowTargetSpacing;
+    const uint64_t Blocktime = params.nPowTargetSpacing;
     const unsigned int timeDaySeconds = 86400;
-    int64_t pastSecondsMin = timeDaySeconds * 0.025;
-    int64_t pastSecondsMax = timeDaySeconds * 7;
-    int64_t PastBlocksMin = pastSecondsMin / Blocktime;
-    int64_t PastBlocksMax = pastSecondsMax / Blocktime;
+    uint64_t pastSecondsMin = timeDaySeconds * 0.025;
+    uint64_t pastSecondsMax = timeDaySeconds * 7;
+    uint64_t PastBlocksMin = pastSecondsMin / Blocktime;
+    uint64_t PastBlocksMax = pastSecondsMax / Blocktime;
     const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
-	
     if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || 
-        (int64_t)BlockLastSolved->nHeight < PastBlocksMin) {
+        (uint64_t)BlockLastSolved->nHeight < PastBlocksMin) {
         return bnPowLimit.GetCompact(); 
     }
-
     for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
         if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
         PastBlocksMass++;
@@ -78,11 +76,9 @@ unsigned int DUAL_KGW3(const CBlockIndex* pindexLast, const CBlockHeader *pblock
          kgw_dual1 *= PastRateActualSeconds;
          kgw_dual1 /= PastRateTargetSeconds;
     }
-    int64_t nActualTime1 = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
-    int64_t nActualTimespanshort = nActualTime1;	
-
-    if(nActualTime1 < 0) { nActualTime1 = Blocktime; }
-
+    uint64_t nActualTime1 = (uint64_t)( pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime() );
+    uint64_t nActualTimespanshort = (uint64_t) nActualTime1;	
+    //if(nActualTime1 < 0) { nActualTime1 = Blocktime; }
     if (nActualTime1 < Blocktime / 3)
         nActualTime1 = Blocktime / 3;
     if (nActualTime1 > Blocktime * 3)
@@ -93,84 +89,25 @@ unsigned int DUAL_KGW3(const CBlockIndex* pindexLast, const CBlockHeader *pblock
     //Fusion from Retarget and Classic KGW3 (BitSend=)	
     arith_uint256 bnNew;
     bnNew = ((kgw_dual2 + kgw_dual1)/2);
-	
-    // DUAL KGW3 increased rapidly the Diff if Blocktime to last block under Blocktime/6 sec.	
-    if(nActualTimespanshort < Blocktime/6){  
+    //if(nActualTimespanshort < 0) { nActualTimespanshort = 0; }
+    LogPrintf("nActualTimespanshort = %d \n", nActualTimespanshort );
+    if(nActualTimespanshort < Blocktime/6){
+        LogPrintf("ORIG  : %08x %s DIFF \n", bnNew.GetCompact(), bnNew.ToString().c_str());
 	const int nLongShortNew1 = 85;
         const int nLongShortNew2 = 100;
         bnNew = bnNew * nLongShortNew1;	
-        bnNew = bnNew / nLongShortNew2;	
+        bnNew = bnNew / nLongShortNew2;
+        LogPrintf("ADJUST: %08x %s DIFF \n", bnNew.GetCompact(), bnNew.ToString().c_str() );
     }
 
     //BitBreak BitSend
-    const int nLongTimeLimit = 30 * 60;
-
-    // Reduce difficulty if current block generation time has already exceeded maximum time limit.
+    const int nLongTimeLimit = 3 * 60 * 60;
     if ((pblock-> nTime - pindexLast->GetBlockTime()) > nLongTimeLimit){
-	bnNew = bnPowLimit/15;
-        LogPrintf("<BSD> Maximum block time hit - adjusted diff to %08x %s\n", bnNew.GetCompact(), bnNew.ToString().c_str()); 
-    }
-
-    // Debug
-    if (bnNew > bnPowLimit){
-        LogPrintf("* We wanted to set diff to %08x but bnPowLimit is %08x \n", bnNew.GetCompact(), bnPowLimit.GetCompact());
-        bnNew = bnPowLimit;
+	bnNew = bnPowLimit;
+        LogPrintf("* Maximum blocktime exceeded - diff to %08x %s (bnPowLimit)\n", bnNew.GetCompact(), bnNew.ToString().c_str()); 
     }
 
     return bnNew.GetCompact();
-}
-
-unsigned int KimotoGravityWell(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
-
-        unsigned int npowWorkLimit = UintToArith256(params.powLimit).GetCompact();
-	int blockstogoback = 0;
-
-	//set default to pre-v2.0 values
-	int64_t retargetTimespan = params.nPowTargetTimespan;
-	int64_t retargetInterval = params.nPowTargetSpacing;
-
-	// Genesis block
-	if (pindexLast == NULL)
-		return npowWorkLimit;
-
-	// DigiByte: This fixes an issue where a 51% attack can change difficulty at will.
-	// Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
-	blockstogoback = retargetInterval-1;
-	if ((pindexLast->nHeight+1) != retargetInterval)
-		blockstogoback = retargetInterval;
-
-	// Go back by what we want to be 14 days worth of blocks
-	const CBlockIndex* pindexFirst = pindexLast;
-	for (int i = 0; pindexFirst && i < blockstogoback; i++)
-		pindexFirst = pindexFirst->pprev;
-	assert(pindexFirst);
-
-	// Limit adjustment step
-	int64_t nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
-	LogPrintf("nActualTimespan = %d  before bounds\n", nActualTimespan);
-
-	// thanks to RealSolid & WDC for this code
-	LogPrintf("GetNextWorkRequired nActualTimespan Limiting\n");
-	if (nActualTimespan < (retargetTimespan - (retargetTimespan/4)) ) nActualTimespan = (retargetTimespan - (retargetTimespan/4));
-	if (nActualTimespan > (retargetTimespan + (retargetTimespan/2)) ) nActualTimespan = (retargetTimespan + (retargetTimespan/2));
-
-	arith_uint256 bnNew;
-	arith_uint256 bnBefore;
-	bnNew.SetCompact(pindexLast->nBits);
-	bnBefore=bnNew;
-	bnNew *= nActualTimespan;
-	bnNew /= retargetTimespan;
-
-	if (bnNew > UintToArith256(params.powLimit))
-		bnNew = UintToArith256(params.powLimit);
-
-	// debug print
-	LogPrintf("GetNextWorkRequired RETARGET\n");
-	LogPrintf("nTargetTimespan = %d    nActualTimespan = %d\n", retargetTimespan, nActualTimespan);
-	LogPrintf("Before: %08x  %s\n", pindexLast->nBits, ArithToUint256(bnBefore).ToString());
-	LogPrintf("After:  %08x  %s\n", bnNew.GetCompact(), ArithToUint256(bnNew).ToString());
-
-	return bnNew.GetCompact();
 }
 
 unsigned int GetNextWorkRequired_legacy(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
@@ -287,14 +224,12 @@ bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params, bool
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
 
+    // due to dual_kgw's timeout parameter, we won't actually require a smoothing period for new algo
     int RetargetMode = 1;
 
-    if (pindexLast->nHeight+1 >= params.CloverhashHeight) { RetargetMode = 2; }
-    if (params.fPowAllowMinDifficultyBlocks || params.fPowNoRetargeting) { RetargetMode = 3; }
-
+    if (pindexLast->nHeight+1 >= params.RetargetAlgorithmSwitch) { RetargetMode = 2; }
     if (RetargetMode == 1) { return GetNextWorkRequired_legacy(pindexLast, pblock, params); }
-    if (RetargetMode == 2) { return KimotoGravityWell(pindexLast, pblock, params); }
-    if (RetargetMode == 3) { return DUAL_KGW3(pindexLast, pblock, params); }
+    if (RetargetMode == 2) { return DUAL_KGW3(pindexLast, pblock, params); }
 
     // if we're here, something weird garnon
     return GetNextWorkRequired_legacy(pindexLast, pblock, params);
