@@ -82,7 +82,8 @@ public:
         consensus.RetargetAlgorithmSwitch = 25000;
         consensus.CloverhashHeight = 30000;
         consensus.powLimit = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 10 * 60; // 10 minutes per retarget (2 blocks)
+        consensus.nPowTargetTimespanV1 = 10 * 60; // 10 minutes per retarget (2 blocks)
+        consensus.nPowTargetTimespanV2 = 60 * 60; // 60 minutes per retarget (12 blocks)
         consensus.nPowTargetSpacing = 5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
@@ -134,9 +135,9 @@ public:
         vSeeds.emplace_back("chancoin.info", true); */
 
         base58Prefixes[PUBKEY_ADDRESS]  = std::vector<unsigned char>(1,28);
-        base58Prefixes[SCRIPT_ADDRESS]  = std::vector<unsigned char>(1,54);
+        base58Prefixes[SCRIPT_ADDRESS]  = std::vector<unsigned char>(1,5);
         base58Prefixes[SCRIPT_ADDRESS2] = std::vector<unsigned char>(1,50);
-        base58Prefixes[SECRET_KEY]      = std::vector<unsigned char>(1,176);
+        base58Prefixes[SECRET_KEY]      = std::vector<unsigned char>(1,156);
         base58Prefixes[EXT_PUBLIC_KEY]  = {0x04, 0x88, 0xB2, 0x1E};
         base58Prefixes[EXT_SECRET_KEY]  = {0x04, 0x88, 0xAD, 0xE4};
 
@@ -181,7 +182,7 @@ public:
         consensus.CloverhashHeight = 1000;
         consensus.RetargetAlgorithmSwitch = 4;
         consensus.powLimit = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 10 * 60; // 10 minutes per retarget (2 blocks)
+        consensus.nPowTargetTimespanV1 = 10 * 60; // 10 minutes per retarget (2 blocks)
         consensus.nPowTargetSpacing = 5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
@@ -259,7 +260,7 @@ public:
         consensus.CloverhashHeight = INT32_MAX;
         consensus.RetargetAlgorithmSwitch = 2000; // doesn't matter what we set it to here
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 10 * 60; // 10 minutes per retarget (2 blocks)
+        consensus.nPowTargetTimespanV1 = 10 * 60; // 10 minutes per retarget (2 blocks)
         consensus.nPowTargetSpacing = 2.5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
