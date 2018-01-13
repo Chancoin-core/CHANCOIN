@@ -12,93 +12,63 @@
 #include "util.h"
 #include "crypto/dag.h"
 
-unsigned int KimotoGravityWell(const CBlockIndex *pindexLast, const Consensus::Params &params) {
-    /* current difficulty formula - kimoto gravity well */
-    unsigned int TimeDaySeconds = 60 * 60 * 24;
-    int64_t	PastSecondsMin = TimeDaySeconds * 0.25;
-    int64_t	PastSecondsMax = TimeDaySeconds * 7;
-    uint64_t PastBlocksMin = PastSecondsMin / params.nPowTargetSpacing;
-    uint64_t PastBlocksMax = PastSecondsMax / params.nPowTargetSpacing;
-    const CBlockIndex *BlockLastSolved = pindexLast;
-    const CBlockIndex *BlockReading = pindexLast;
-    uint64_t PastBlocksMass = 0;
-    int64_t PastRateActualSeconds = 0;
-    int64_t PastRateTargetSeconds = 0;
-    double PastRateAdjustmentRatio = double(1);
-    arith_uint256 PastDifficultyAverage;
-    arith_uint256 PastDifficultyAveragePrev;
-    double EventHorizonDeviation;
-    double EventHorizonDeviationFast;
-    double EventHorizonDeviationSlow;
+unsigned int KimotoGravityWell(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
 
-    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 ||
-        (uint64_t)BlockLastSolved->nHeight < PastBlocksMin) {
-        return UintToArith256(params.powLimit).GetCompact();
-    }
+        unsigned int npowWorkLimit = UintToArith256(params.powLimit).GetCompact();
+	int blockstogoback = 0;
 
-    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
-        if (PastBlocksMax > 0 && i > PastBlocksMax) {
-            break;
-        }
-        PastBlocksMass++;
+	//set default to pre-v2.0 values
+	int64_t retargetTimespan = params.nPowTargetTimespanV2;
+	int64_t retargetInterval = params.nPowTargetSpacing;
 
-        if (i == 1) {
-            PastDifficultyAverage.SetCompact(BlockReading->nBits);
-        } else {
-            PastDifficultyAverage = ((arith_uint256().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / i) + PastDifficultyAveragePrev;
-        }
-        PastDifficultyAveragePrev = PastDifficultyAverage;
+	// Genesis block
+	if (pindexLast == NULL)
+		return npowWorkLimit;
 
-        PastRateActualSeconds = BlockLastSolved->GetBlockTime() - BlockReading->GetBlockTime();
-        PastRateTargetSeconds = params.nPowTargetTimespan * PastBlocksMass;
-        PastRateAdjustmentRatio = 1.0;
-        if (PastRateActualSeconds < 0) {
-            PastRateActualSeconds = 0;
-        }
-        if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
-            PastRateAdjustmentRatio = PastRateTargetSeconds / (double)PastRateActualSeconds;
-        }
-        EventHorizonDeviation =
-                1 + (0.7084 * std::pow((PastBlocksMass / 144.0), -1.228));
-        EventHorizonDeviationFast = EventHorizonDeviation;
-        EventHorizonDeviationSlow = 1 / EventHorizonDeviation;
+	// DigiByte: This fixes an issue where a 51% attack can change difficulty at will.
+	// Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
+	blockstogoback = retargetInterval-1;
+	if ((pindexLast->nHeight+1) != retargetInterval)
+		blockstogoback = retargetInterval;
 
-        if (PastBlocksMass >= PastBlocksMin) {
-            if ((PastRateAdjustmentRatio <= EventHorizonDeviationSlow) ||
-                (PastRateAdjustmentRatio >= EventHorizonDeviationFast)) {
-                assert(BlockReading);
-                break;
-            }
-        }
-        if (BlockReading->pprev == NULL) {
-            assert(BlockReading);
-            break;
-        }
-        BlockReading = BlockReading->pprev;
-    }
+	// Go back by what we want to be 14 days worth of blocks
+	const CBlockIndex* pindexFirst = pindexLast;
+	for (int i = 0; pindexFirst && i < blockstogoback; i++)
+		pindexFirst = pindexFirst->pprev;
+	assert(pindexFirst);
 
-    arith_uint256 bnNew(PastDifficultyAverage);
-    if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
-        bnNew *= PastRateActualSeconds;
-        bnNew /= PastRateTargetSeconds;
-    }
-    if (bnNew > UintToArith256(params.powLimit)) {
-        bnNew = UintToArith256(params.powLimit);
-    }
+	// Limit adjustment step
+	int64_t nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
+	LogPrintf("nActualTimespan = %d  before bounds\n", nActualTimespan);
 
-    return bnNew.GetCompact();
+	// thanks to RealSolid & WDC for this code
+	LogPrintf("GetNextWorkRequired nActualTimespan Limiting\n");
+	if (nActualTimespan < (retargetTimespan - (retargetTimespan/4)) ) nActualTimespan = (retargetTimespan - (retargetTimespan/4));
+	if (nActualTimespan > (retargetTimespan + (retargetTimespan/2)) ) nActualTimespan = (retargetTimespan + (retargetTimespan/2));
+
+	arith_uint256 bnNew;
+	arith_uint256 bnBefore;
+	bnNew.SetCompact(pindexLast->nBits);
+	bnBefore=bnNew;
+	bnNew *= nActualTimespan;
+	bnNew /= retargetTimespan;
+
+	if (bnNew > UintToArith256(params.powLimit))
+		bnNew = UintToArith256(params.powLimit);
+
+	// debug print
+	LogPrintf("GetNextWorkRequired RETARGET\n");
+	LogPrintf("nTargetTimespan = %d    nActualTimespan = %d\n", retargetTimespan, nActualTimespan);
+	LogPrintf("Before: %08x  %s\n", pindexLast->nBits, ArithToUint256(bnBefore).ToString());
+	LogPrintf("After:  %08x  %s\n", bnNew.GetCompact(), ArithToUint256(bnNew).ToString());
+
+	return bnNew.GetCompact();
 }
 
-unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
+unsigned int GetNextWorkRequired_legacy(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     assert(pindexLast != nullptr);
     unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
-    if(pindexLast->nHeight+1 >= params.CloverhashHeight) {
-        if(params.fPowAllowMinDifficultyBlocks || params.fPowNoRetargeting)
-            goto bail;
-        return KimotoGravityWell(pindexLast, params);
-    }
-    bail:
 
     // Only change once per difficulty adjustment interval
     if ((pindexLast->nHeight+1) % params.DifficultyAdjustmentInterval() != 0)
@@ -146,10 +116,10 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
 
     // Limit adjustment step
     int64_t nActualTimespan = pindexLast->GetBlockTime() - nFirstBlockTime;
-    if (nActualTimespan < params.nPowTargetTimespan/4)
-        nActualTimespan = params.nPowTargetTimespan/4;
-    if (nActualTimespan > params.nPowTargetTimespan*4)
-        nActualTimespan = params.nPowTargetTimespan*4;
+    if (nActualTimespan < params.nPowTargetTimespanV1/4)
+        nActualTimespan = params.nPowTargetTimespanV1/4;
+    if (nActualTimespan > params.nPowTargetTimespanV1*4)
+        nActualTimespan = params.nPowTargetTimespanV1*4;
 
     // Retarget
     arith_uint256 bnNew;
@@ -162,7 +132,7 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
     if (fShift)
         bnNew >>= 1;
     bnNew *= nActualTimespan;
-    bnNew /= params.nPowTargetTimespan;
+    bnNew /= params.nPowTargetTimespanV1;
     if (fShift)
         bnNew <<= 1;
 
@@ -206,3 +176,16 @@ bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params, bool
 
     return true;
 }
+
+unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
+
+    int RetargetMode = 1;
+
+    if (pindexLast->nHeight+1 >= params.RetargetAlgorithmSwitch) { RetargetMode = 2; }
+    if (RetargetMode == 1) { return GetNextWorkRequired_legacy(pindexLast, pblock, params); }
+    if (RetargetMode == 2) { return KimotoGravityWell(pindexLast, pblock, params); }
+
+    // if we're here, something weird garnon
+    return GetNextWorkRequired_legacy(pindexLast, pblock, params);
+}
+

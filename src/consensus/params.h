@@ -48,6 +48,8 @@ struct Params {
     int BIP66Height;
     /** Block height at which Cloverhash becomes active */
     int CloverhashHeight;
+    /** Block height at which we switch to Dual_KGW3 */
+    int RetargetAlgorithmSwitch;
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.
@@ -61,8 +63,9 @@ struct Params {
     bool fPowAllowMinDifficultyBlocks;
     bool fPowNoRetargeting;
     int64_t nPowTargetSpacing;
-    int64_t nPowTargetTimespan;
-    int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
+    int64_t nPowTargetTimespanV1;
+    int64_t nPowTargetTimespanV2;
+    int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespanV2 / nPowTargetSpacing; }
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
 };
