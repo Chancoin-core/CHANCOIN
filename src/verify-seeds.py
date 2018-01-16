@@ -37,7 +37,7 @@ seedinclude.closed
 for line in seeddata.split('\n'):
   addr_build = ''
   octet_place = 0
-  if '19117' in line:
+  if '19117' in line and '//' not in line:
     seed = find_between(line, '0xff,0xff,', '}, 19117},').split(',')
     for octet in seed:
      try:
