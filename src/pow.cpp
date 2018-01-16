@@ -19,7 +19,7 @@ unsigned int KimotoGravityWell(const CBlockIndex* pindexLast, const CBlockHeader
 
 	//set default to pre-v2.0 values
 	int64_t retargetTimespan = params.nPowTargetTimespanV2;
-	int64_t retargetInterval = params.nPowTargetSpacing;
+	int64_t retargetInterval = (retargetTimespan / params.nPowTargetSpacing);
 
 	// Genesis block
 	if (pindexLast == NULL)
