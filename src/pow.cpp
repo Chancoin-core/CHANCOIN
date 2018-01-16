@@ -180,6 +180,46 @@ bool CheckProofOfWork(CBlockHeader header, const Consensus::Params& params, bool
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
 
     int RetargetMode = 1;
+    volatile bool debug = false;
+    if(debug) {
+        assert(pindexLast != nullptr);
+        unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
+        if ((pindexLast->nHeight+1) % params.DifficultyAdjustmentInterval() != 0) {
+               if (params.fPowAllowMinDifficultyBlocks)
+               {
+                   // Special difficulty rule for testnet:
+                   // If the new block's timestamp is more than 2* 10 minutes
+                   // then allow mining of a min-difficulty block.
+                   if (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nPowTargetSpacing*2)
+                       return nProofOfWorkLimit;
+                   else
+                   {
+                       // Return the last non-special-min-difficulty-rules-block
+                       const CBlockIndex* pindex = pindexLast;
+                       while (pindex->pprev && pindex->nHeight % params.DifficultyAdjustmentInterval() != 0 && pindex->nBits == nProofOfWorkLimit)
+                           pindex = pindex->pprev;
+                       return pindex->nBits;
+                   }
+               }
+               return pindexLast->nBits;
+           }
+
+           // Go back by what we want to be 14 days worth of blocks
+           // Chancoin: This fixes an issue where a 51% attack can change difficulty at will.
+           // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
+           int blockstogoback = params.DifficultyAdjustmentInterval()-1;
+           if ((pindexLast->nHeight+1) != params.DifficultyAdjustmentInterval())
+               blockstogoback = params.DifficultyAdjustmentInterval();
+
+           // Go back by what we want to be 14 days worth of blocks
+           const CBlockIndex* pindexFirst = pindexLast;
+           for (int i = 0; pindexFirst && i < blockstogoback; i++)
+               pindexFirst = pindexFirst->pprev;
+
+           assert(pindexFirst);
+
+       return CalculateNextWorkRequired(pindexLast, pindexFirst->GetBlockTime(), params);
+    }
 
     if (pindexLast->nHeight+1 >= params.RetargetAlgorithmSwitch) { RetargetMode = 2; }
     if (RetargetMode == 1) { return GetNextWorkRequired_legacy(pindexLast, pblock, params); }
