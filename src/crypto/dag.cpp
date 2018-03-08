@@ -69,7 +69,7 @@ bool CDAGSystem::is_prime(uint64_t num) {
     if ((num % 2 == 0) && num > 2)
         return false;
 
-    for(uint64_t i = 3; i < num*num; i += 2) {
+    for(uint64_t i = 3; i <= sqrt(num); i += 2) {
         if(num % i == 0)
             return false;
     }
