@@ -289,6 +289,9 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->height         = diskindex.height;
                 pindexNew->hashMix        = diskindex.hashMix;
 
+                if((pindexNew->nVersion & 0x20000000) && !(pindexNew->nVersion & 0x00000100))
+                    return error("%s: miscreated versionbits: %s", __func__, pindexNew->ToString());
+
                 // Chancoin: Disable PoW Sanity check while loading block index from disk.
                 // We use the sha256 hash for the block index for performance reasons, which is recorded for later use.
                 // CheckProofOfWork() uses the scrypt hash which is discarded after a block is accepted.

@@ -13,7 +13,7 @@ static const int32_t VERSIONBITS_LAST_OLD_BLOCK_VERSION = 512;
 /** What bits to set in version for versionbits blocks */
 static const int32_t VERSIONBITS_TOP_BITS = 0x20000100UL;
 /** What bitmask determines whether versionbits is in use */
-static const int32_t VERSIONBITS_TOP_MASK = 0xE0000000UL;
+static const int32_t VERSIONBITS_TOP_MASK = 0xE0000100UL;
 /** Total bits available for versionbits */
 static const int32_t VERSIONBITS_NUM_BITS = 29;
 

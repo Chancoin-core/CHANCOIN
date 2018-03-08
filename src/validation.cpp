@@ -2959,7 +2959,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     if((block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) ||
        (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) ||
        (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height) ||
-       (block.nVersion < 512 && nHeight >= consensusParams.CloverhashHeight))
+       (!(block.nVersion & 0x00000100) && nHeight >= consensusParams.CloverhashHeight))
             return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
                                  strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
