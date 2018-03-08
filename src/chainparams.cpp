@@ -80,7 +80,7 @@ public:
         consensus.BIP65Height = 30000;
         consensus.BIP66Height = 30000;
         consensus.RetargetAlgorithmSwitch = 23500;
-        consensus.CloverhashHeight = 30000;
+        consensus.CloverhashHeight = 32000;
         consensus.powLimit = uint256S("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespanV1 = 10 * 60; // 10 minutes per retarget (2 blocks)
         consensus.nPowTargetTimespanV2 = 60 * 60; // 60 minutes per retarget (12 blocks)
