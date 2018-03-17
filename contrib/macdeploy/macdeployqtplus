@@ -219,6 +219,17 @@ def getFrameworks(binaryPath, verbose):
     libraries = []
     for line in otoolLines:
         line = line.replace("@loader_path", os.path.dirname(binaryPath))
+
+        # mangofu - epic hack to add on libboost_system-mt
+        if line.find('libboost_system.dylib') != -1:
+            real_line = line.replace('libboost_system.dylib', 'libboost_system-mt.dylib')
+            info_hack = FrameworkInfo.fromOtoolLibraryLine(real_line.strip())
+            if info_hack is not None:
+                if verbose >= 3:
+                    print("Found framework:")
+                    print(info_hack)
+                libraries.append(info_hack)
+
         info = FrameworkInfo.fromOtoolLibraryLine(line.strip())
         if info is not None:
             if verbose >= 3:
