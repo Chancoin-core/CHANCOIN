@@ -199,6 +199,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     {
         for (const auto& txin : tx.vin) {
             if (
+                    (txin.prevout.hash == uint256S("34b14fc43fd6d4ef18f05c81113b8cf4437597d65f03e0d93b76a39a99b943bc") && txin.prevout.n == 1) || // Test freeze
                     (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 0) || // 853737.95200000 CHAN burned
                     (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 1) || // 223982.00000000 CHAN burned
                     (txin.prevout.hash == uint256S("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && txin.prevout.n == 1) || // 198223.00000000 CHAN burned
