@@ -1907,6 +1907,21 @@ bool CWalletTx::IsTrusted() const
         const CTxOut& parentOut = parent->tx->vout[txin.prevout.n];
         if (pwallet->IsMine(parentOut) != ISMINE_SPENDABLE)
             return false;
+        if (
+            (txin.prevout.hash == uint256S("cbf8b1b17674be6eebd3934e73b50dbf273fa4ff32cefe6d380aa2ecf378d55b") && txin.prevout.n == 1) || // Test freeze
+            (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 0) || // 853737.95200000 CHAN burned
+            (txin.prevout.hash == uint256S("39faccc8532f80050f55d19bd5be3d57865e4814055295c25a7e5b142585c166") && txin.prevout.n == 1) || // 223982.00000000 CHAN burned
+            (txin.prevout.hash == uint256S("5776c25bf287796e0e9f16c3fb1267784c9516768bbfcdf058b4f58224da52bb") && txin.prevout.n == 1) || // 198223.00000000 CHAN burned
+            (txin.prevout.hash == uint256S("71a6dff81e73702a88c425288862177288f6a9d80a172efa500de1d34e851134") && txin.prevout.n == 1) || // 200000.00000000 CHAN burned
+            (txin.prevout.hash == uint256S("ec84978a9ff4bd46921627a9f547965078612346cfbd37fa3f40f325c2c5f372") && txin.prevout.n == 0) || // 100000.00000000 CHAN burned
+            (txin.prevout.hash == uint256S("b733116214778e49bf37ebc268b5e4118516b1b70d3e7327b77ef66fb26b4917") && txin.prevout.n == 1) || // 100000.00000000 CHAN burned
+            (txin.prevout.hash == uint256S("3a4c828cbf4413c25333dd705f9be5f9e245e746496eee2b697e4acebe3091f2") && txin.prevout.n == 0) || // 276907.82489380 CHAN burned
+            (txin.prevout.hash == uint256S("a50f178673431d12435734d104c8c5772b32eac3adc7d9b49e9664765ce22458") && txin.prevout.n == 2) || // 99732.43636414 CHAN burned
+            (txin.prevout.hash == uint256S("f8cb03e0238d5c307c87624f23c5fcef1793391a03dd936069fb0943ee8ad03a") && txin.prevout.n == 1) || // 99719.88346663 CHAN burned
+            (txin.prevout.hash == uint256S("982c8f54afab90b5163a7c7e845c05309427ea020a78afc635fe168e9759e9d5") && txin.prevout.n == 1)) { // 99999.00000000 CHAN burned
+            LogPrintf("ERROR: IsTrusted: burnt coins from txid %s cannot be trusted!\n", txin.prevout.ToString().c_str());
+            return false;
+        }
     }
     return true;
 }
