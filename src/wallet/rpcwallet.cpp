@@ -408,7 +408,7 @@ static void SendMoney(CWallet * const pwallet, const CTxDestination &address, CA
     }
     CValidationState state;
 
-    if ( !CheckTransaction(wtxNew->tx.get(), state) ) {
+    if ( !CheckTransaction(wtxNew.tx.get(), state) ) {
       strError = strprintf("Error: The transaction was rejected! Reason given: %s", "frozen coins, I reckon");
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     } else {
