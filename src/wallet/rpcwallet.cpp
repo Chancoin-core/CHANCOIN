@@ -406,17 +406,11 @@ static void SendMoney(CWallet * const pwallet, const CTxDestination &address, CA
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
-    CValidationState state;
-
-    if ( !CheckTransaction(wtxNew.tx.get(), state) ) {
-      strError = strprintf("Error: The transaction was rejected! Reason given: %s", "frozen coins, I reckon");
-        throw JSONRPCError(RPC_WALLET_ERROR, strError);
-    } else {
+     CValidationState state;
       if (!pwallet->CommitTransaction(wtxNew, reservekey, g_connman.get(), state)) {
         strError = strprintf("Error: The transaction was rejected! Reason given: %s", state.GetRejectReason());
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
       }
-    }
 }
 
 UniValue sendtoaddress(const JSONRPCRequest& request)
