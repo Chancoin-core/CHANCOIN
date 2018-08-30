@@ -6,6 +6,7 @@
 #include "amount.h"
 #include "base58.h"
 #include "chain.h"
+#include "consensus/tx_verify.h"
 #include "consensus/validation.h"
 #include "core_io.h"
 #include "init.h"
@@ -405,11 +406,11 @@ static void SendMoney(CWallet * const pwallet, const CTxDestination &address, CA
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
-    CValidationState state;
-    if (!pwallet->CommitTransaction(wtxNew, reservekey, g_connman.get(), state)) {
+     CValidationState state;
+      if (!pwallet->CommitTransaction(wtxNew, reservekey, g_connman.get(), state)) {
         strError = strprintf("Error: The transaction was rejected! Reason given: %s", state.GetRejectReason());
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
-    }
+      }
 }
 
 UniValue sendtoaddress(const JSONRPCRequest& request)
