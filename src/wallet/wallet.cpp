@@ -2205,7 +2205,7 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
           safeTx = false;
         }
 
-        if (fOnlySafe && !safeTx) {
+        if (!safeTx) {
           continue;
         }
 
